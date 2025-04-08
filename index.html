@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Eksperyment Online</title>
-    <!-- Ładowanie PIXI.js i PsychoJS -->
-    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.0.0/dist/pixi.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/psychojs@2022.2.4/dist/psychojs.js"></script>    <!-- Ładowanie experiment.js z atrybutem defer -->
+    <!-- Ładowanie PIXI.js -->
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.0.0/dist/pixi.min.js" onload="console.log('PIXI.js loaded successfully')" onerror="alert('Błąd: Nie udało się załadować PIXI.js. Sprawdź połączenie z internetem.')"></script>
+    <!-- Ładowanie PsychoJS -->
+    <script src="https://cdn.jsdelivr.net/npm/psychojs@2021.2.3/dist/psychojs.js" onload="console.log('PsychoJS loaded successfully')" onerror="alert('Błąd: Nie udało się załadować PsychoJS. Sprawdź połączenie z internetem.')"></script>
+    <!-- Ładowanie experiment.js z atrybutem defer -->
     <script defer src="experiment.js"></script>
     <style>
         body {
