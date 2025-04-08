@@ -1,8 +1,13 @@
+// Sprawdzenie, czy PsychoJS jest załadowany
+if (typeof PsychoJS === 'undefined') {
+    alert('Błąd: Biblioteka PsychoJS nie została załadowana. Sprawdź połączenie z internetem lub pliki konfiguracyjne.');
+    throw new Error('PsychoJS not loaded');
+}
+
 // Inicjalizacja PsychoJS
 const psychoJS = new PsychoJS({
     debug: true
 });
-
 // Dane eksperymentu
 const wordLists = {
     "LEKARZ": ["choroba", "pielęgniarka", "stetoskop", "doktor", "kitel", "pomoc", "fartuch", "szpital", "słuchawki", "recepta", "specjalista", "zdrowie", "pediatra", "pacjent", "lek"],
