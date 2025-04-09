@@ -4,16 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eksperyment Online</title>
+    <!-- Ładowanie jsPsych -->
     <script src="https://unpkg.com/jspsych@7.3.1"></script>
+    <link href="https://unpkg.com/jspsych@7.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+    <!-- Ładowanie wtyczek jsPsych -->
     <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.2"></script>
     <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.2"></script>
     <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.1.2"></script>
     <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.1.2"></script>
+    <!-- Ładowanie DataPipe do zapisu danych -->
     <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@1.0.3"></script>
-    <link href="https://unpkg.com/jspsych@7.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        .jspsych-display-element {
+            max-width: 1200px;
+            max-height: 800px;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin: 0;
+        }
+        p {
+            font-size: 1.2em;
+            line-height: 1.5;
+        }
         .jspsych-content h1 {
-            margin-bottom: 50px; /* Zwiększa odstęp między słowem a przyciskami */
+            margin-bottom: 50px; /* Zwiększa odstęp między słowem a przyciskami w fazie rozpoznawania */
         }
         .jspsych-btn {
             margin: 10px; /* Dodaje odstęp między przyciskami */
