@@ -66,6 +66,31 @@ const mathTasks = [
     { question: "8 × 2 =", answer: 16 }
 ];
 
+// Funkcja zapisu danych na OSF
+async function saveDataToOSF(data, filename) {
+    try {
+        const response = await fetch('https://pipe.jspsych.org/api/data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': '*/*'
+            },
+            body: JSON.stringify({
+                experimentID: 'nIbjy3keQoaX',
+                filename: filename,
+                data: data
+            })
+        });
+        if (!response.ok) {
+            throw new Error('Błąd zapisu danych na OSF: ' + response.statusText);
+        }
+        return response.json();
+    } catch (error) {
+        console.error('Wystąpił błąd podczas zapisywania danych:', error);
+        alert('Wystąpił problem z zapisem danych. Skontaktuj się z badaczem.');
+    }
+}
+
 // Inicjalizacja jsPsych
 const participantId = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 15);
 const group = assignToGroup();
@@ -98,31 +123,6 @@ const jsPsych = initJsPsych({
     },
     use_webaudio: false
 });
-
-// Funkcja zapisu danych na OSF
-async function saveDataToOSF(data, filename) {
-    try {
-        const response = await fetch('https://pipe.jspsych.org/api/data', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': '*/*'
-            },
-            body: JSON.stringify({
-                experimentID: 'nIbjy3keQoaX',
-                filename: filename,
-                data: data
-            })
-        });
-        if (!response.ok) {
-            throw new Error('Błąd zapisu danych na OSF: ' + response.statusText);
-        }
-        return response.json();
-    } catch (error) {
-        console.error('Wystąpił błąd podczas zapisywania danych:', error);
-        alert('Wystąpił problem z zapisem danych. Skontaktuj się z badaczem.');
-    }
-}
 
 // Funkcja przypisania do grupy
 function assignToGroup() {
@@ -167,7 +167,8 @@ const demographics = {
         { prompt: "Podaj swój wiek:", name: 'age', required: true, input_type: 'number' },
         { prompt: "Podaj swoją płeć (Kobieta, Mężczyzna, Inna, Wolę nie podawać):", name: 'gender', required: true }
     ],
-    data: { participant_id: participantId, group: group, phase: 'demographics' }
+    data: { participant_id: participantId, group: group, phase: 'demographics' },
+    button_label: 'Przejdź dalej' // Wymaga kliknięcia przycisku
 };
 timeline.push(demographics);
 
@@ -280,7 +281,8 @@ for (let i = 0; i < mathTasks.length; i++) {
             math_question: mathTasks[i].question, 
             correct_answer: mathTasks[i].answer,
             phase: 'math'
-        }
+        },
+        button_label: 'Przejdź dalej' // Wymaga kliknięcia przycisku
     };
     timeline.push(mathTrial);
 }
@@ -340,7 +342,8 @@ for (const word of shuffledRecognitionList) {
             word: word,
             word_order: wordIndexMap[word],
             phase: 'confidence'
-        }
+        },
+        button_label: 'Przejdź dalej' // Wymaga kliknięcia przycisku
     };
     timeline.push(confidenceTrial);
 }
