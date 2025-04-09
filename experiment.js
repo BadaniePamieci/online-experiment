@@ -59,12 +59,23 @@ const mathTasks = [
 // Inicjalizacja jsPsych
 const jsPsych = initJsPsych({
     on_finish: function() {
-        const data = jsPsych.data.get().csv();
-        if (data.trim() !== "") {
-            saveDataToOSF(data);
+        const data = jsPsych.data.get();
+        const dataArray = data.values();
+        if (dataArray.length > 0) {
+            const csvData = data.csv();
+            saveDataToOSF(csvData);
         } else {
-            console.log("Brak danych do zapisania.");
+            console.log("Brak danych do zapisania (brak rekordów).");
         }
+    },
+    use_webaudio: false
+});
+
+// Globalny listener dla ESC
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        console.log("Naciśnięto ESC – kończę eksperyment.");
+        jsPsych.endExperiment('Eksperyment zakończony przez użytkownika.');
     }
 });
 
@@ -106,32 +117,29 @@ const timeline = [];
 const participantId = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 15);
 const group = assignToGroup();
 
+// Instrukcje początkowe
 const instructions = {
-    type: jsPsychHtmlKeyboardResponse,
+    type: jsPsychHtmlButtonResponse,
     stimulus: `
         <h2>Witamy w badaniu naukowym</h2>
         <p>Wszystkie dane są anonimowe i będą wykorzystywane wyłącznie do celów naukowych.</p>
         <p>Twoim zadaniem jest zapamiętanie jak najwięcej słów z każdej listy. Po każdej liście przeczytasz krótki tekst. Na koniec odbędzie się test rozpoznawania słów.</p>
-        <p>Naciśnij SPACJĘ, aby kontynuować.</p>
+        <p>Kliknij przycisk poniżej, aby kontynuować.</p>
         <p>(Naciśnij ESC, aby wyjść w dowolnym momencie)</p>
     `,
-    choices: ['space', 'escape'],
+    choices: ['Przejdź dalej'],
     on_finish: function(data) {
-        console.log("Naciśnięto klawisz:", data.response);
-        console.log("Pełne dane:", data); // Dodajemy pełne dane dla debugowania
-        if (data.response === 'escape') {
-            jsPsych.endExperiment('Eksperyment zakończony przez użytkownika.');
-        } else if (data.response === 'space') {
-            console.log("Przechodzę do następnego kroku...");
-        }
+        console.log("Kliknięto przycisk:", data.response);
+        console.log("Pełne dane:", data);
     }
 };
 timeline.push(instructions);
+
 // Dane demograficzne
 const demographics = {
     type: jsPsychSurveyText,
     questions: [
-        { prompt: "Podaj swój wiek:", name: 'age', required: true },
+        { prompt: "Podaj swój wiek:", name: 'age', required: true, input_type: 'number' },
         { prompt: "Podaj swoją płeć (Kobieta, Mężczyzna, Inna, Wolę nie podawać):", name: 'gender', required: true }
     ],
     data: { participant_id: participantId, group: group }
@@ -148,15 +156,10 @@ for (let i = 0; i < listOrder.length; i++) {
         const wordTrial = {
             type: jsPsychHtmlKeyboardResponse,
             stimulus: `<h1>${word}</h1>`,
-            choices: ['escape'],
+            choices: ['no_response'], // Brak odpowiedzi, tylko ESC działa
             trial_duration: 1000,
             response_ends_trial: false,
             post_trial_gap: 500,
-            on_finish: function(data) {
-                if (data.response === 'escape') {
-                    jsPsych.endExperiment('Eksperyment zakończony przez użytkownika.');
-                }
-            },
             data: { participant_id: participantId, group: group, list_name: listName, trial_number: i + 1, word: word }
         };
         timeline.push(wordTrial);
@@ -168,35 +171,28 @@ for (let i = 0; i < listOrder.length; i++) {
     const sentences = narrationText.split('.').map(s => s.trim()).filter(s => s);
 
     const narrationInstructions = {
-        type: jsPsychHtmlKeyboardResponse,
+        type: jsPsychHtmlButtonResponse,
         stimulus: `
             <p>Przeczytaj uważnie poniższe zdania. Twój czas będzie mierzony.</p>
-            <p>Naciśnij SPACJĘ, aby kontynuować.</p>
+            <p>Kliknij przycisk poniżej, aby kontynuować.</p>
             <p>(Naciśnij ESC, aby wyjść)</p>
         `,
-        choices: ['space', 'escape'],
+        choices: ['Przejdź dalej'],
         on_finish: function(data) {
-            if (data.response === 'escape') {
-                jsPsych.endExperiment('Eksperyment zakończony przez użytkownika.');
-            }
+            console.log("Kliknięto przycisk w narracji:", data.response);
         }
     };
     timeline.push(narrationInstructions);
 
     for (let j = 0; j < sentences.length; j++) {
         const sentenceTrial = {
-            type: jsPsychHtmlKeyboardResponse,
+            type: jsPsychHtmlButtonResponse,
             stimulus: `
                 <p>Zdanie ${j + 1}:</p>
                 <p>${sentences[j]}.</p>
-                <p>Naciśnij SPACJĘ, aby przejść dalej.</p>
+                <p>Kliknij przycisk, aby przejść dalej.</p>
             `,
-            choices: ['space', 'escape'],
-            on_finish: function(data) {
-                if (data.response === 'escape') {
-                    jsPsych.endExperiment('Eksperyment zakończony przez użytkownika.');
-                }
-            },
+            choices: ['Przejdź dalej'],
             data: { 
                 participant_id: participantId, 
                 group: group, 
@@ -212,19 +208,16 @@ for (let i = 0; i < listOrder.length; i++) {
     // Przerwa między listami (oprócz ostatniej)
     if (i < listOrder.length - 1) {
         const breakTrial = {
-            type: jsPsychHtmlKeyboardResponse,
+            type: jsPsychHtmlButtonResponse,
             stimulus: `
                 <p>Krótka przerwa...</p>
                 <p>Przygotuj się na następną listę słów.</p>
+                <p>Kliknij przycisk, aby kontynuować.</p>
                 <p>(Naciśnij ESC, aby wyjść)</p>
             `,
-            choices: ['escape'],
-            trial_duration: 2000,
-            response_ends_trial: false,
+            choices: ['Przejdź dalej'],
             on_finish: function(data) {
-                if (data.response === 'escape') {
-                    jsPsych.endExperiment('Eksperyment zakończony przez użytkownika.');
-                }
+                console.log("Kliknięto przycisk w przerwie:", data.response);
             }
         };
         timeline.push(breakTrial);
@@ -233,17 +226,15 @@ for (let i = 0; i < listOrder.length; i++) {
 
 // Zadania matematyczne
 const mathIntro = {
-    type: jsPsychHtmlKeyboardResponse,
+    type: jsPsychHtmlButtonResponse,
     stimulus: `
         <p>Teraz rozwiąż kilka prostych zadań matematycznych.</p>
-        <p>Naciśnij SPACJĘ, aby kontynuować.</p>
+        <p>Kliknij przycisk, aby kontynuować.</p>
         <p>(Naciśnij ESC, aby wyjść)</p>
     `,
-    choices: ['space', 'escape'],
+    choices: ['Przejdź dalej'],
     on_finish: function(data) {
-        if (data.response === 'escape') {
-            jsPsych.endExperiment('Eksperyment zakończony przez użytkownika.');
-        }
+        console.log("Kliknięto przycisk w mathIntro:", data.response);
     }
 };
 timeline.push(mathIntro);
@@ -252,7 +243,7 @@ for (let i = 0; i < mathTasks.length; i++) {
     const mathTrial = {
         type: jsPsychSurveyText,
         questions: [
-            { prompt: `${mathTasks[i].question}`, name: `math_${i}`, required: true }
+            { prompt: `${mathTasks[i].question}`, name: `math_${i}`, required: true, input_type: 'number' }
         ],
         data: { 
             participant_id: participantId, 
@@ -266,19 +257,17 @@ for (let i = 0; i < mathTasks.length; i++) {
 
 // Faza rozpoznawania
 const recognitionIntro = {
-    type: jsPsychHtmlKeyboardResponse,
+    type: jsPsychHtmlButtonResponse,
     stimulus: `
         <p>Teraz zobaczysz listę słów. Twoim zadaniem jest określenie, czy dane słowo pojawiło się wcześniej na którejś z list.</p>
         <p>Jeśli słowo pojawiło się wcześniej, naciśnij "Tak". Jeśli nie, naciśnij "Nie".</p>
         <p>Po każdym wyborze ocenisz swoją pewność na skali od 1 (zupełnie niepewny) do 5 (całkowicie pewny).</p>
-        <p>Naciśnij SPACJĘ, aby kontynuować.</p>
+        <p>Kliknij przycisk, aby kontynuować.</p>
         <p>(Naciśnij ESC, aby wyjść)</p>
     `,
-    choices: ['space', 'escape'],
+    choices: ['Przejdź dalej'],
     on_finish: function(data) {
-        if (data.response === 'escape') {
-            jsPsych.endExperiment('Eksperyment zakończony przez użytkownika.');
-        }
+        console.log("Kliknięto przycisk w recognitionIntro:", data.response);
     }
 };
 timeline.push(recognitionIntro);
@@ -322,13 +311,13 @@ for (const word of shuffledRecognitionList) {
 
 // Zakończenie eksperymentu
 const endMessage = {
-    type: jsPsychHtmlKeyboardResponse,
+    type: jsPsychHtmlButtonResponse,
     stimulus: `
         <h2>Dziękujemy za udział w badaniu!</h2>
         <p>Twoje dane zostały zapisane.</p>
-        <p>Naciśnij SPACJĘ, aby zakończyć.</p>
+        <p>Kliknij przycisk, aby zakończyć.</p>
     `,
-    choices: ['space']
+    choices: ['Zakończ']
 };
 timeline.push(endMessage);
 
