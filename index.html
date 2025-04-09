@@ -3,15 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Eksperyment Online</title>
-    <!-- Ładowanie jsPsych -->
     <script src="https://unpkg.com/jspsych@7.3.1/dist/index.browser.min.js"></script>
     <link href="https://unpkg.com/jspsych@7.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
-    <!-- Ładowanie wtyczek jsPsych -->
     <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.2/dist/index.browser.min.js"></script>
     <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.1.2/dist/index.browser.min.js"></script>
     <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.2/dist/index.browser.min.js"></script>
     <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.1.2/dist/index.browser.min.js"></script>
-    <!-- Ładowanie skryptu eksperymentu -->
     <script src="experiment.js"></script>
     <style>
         body {
@@ -35,11 +32,15 @@
         h1 {
             font-size: 2.5em;
             margin: 0;
-            margin-bottom: 50px; /* Przesuwa słowa w górę w fazie rozpoznawania */
         }
         p {
             font-size: 1.2em;
             line-height: 1.5;
+        }
+        .recognition-word {
+            position: relative;
+            top: -100px;
+            margin-bottom: 120px;
         }
     </style>
 </head>
