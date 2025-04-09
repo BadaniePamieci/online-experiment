@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eksperyment Online</title>
     <!-- Ładowanie jsPsych -->
-    <script src="https://unpkg.com/jspsych@7.3.1"></script>
+    <script src="https://unpkg.com/jspsych@7.3.1/dist/index.browser.min.js"></script>
     <link href="https://unpkg.com/jspsych@7.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
     <!-- Ładowanie wtyczek jsPsych -->
-    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.2"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.2"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.1.2"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.1.2"></script>
-    <!-- Ładowanie DataPipe do zapisu danych -->
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.2/dist/index.browser.min.js"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.1.2/dist/index.browser.min.js"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.2/dist/index.browser.min.js"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.1.2/dist/index.browser.min.js"></script>
     <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@1.0.3"></script>
+    <!-- Style -->
     <style>
         body {
             margin: 0;
@@ -50,7 +50,7 @@
     </style>
 </head>
 <body>
-    <div id="jspsych-experiment"></div>
+    <!-- Ładowanie skryptu eksperymentu -->
     <script src="experiment.js"></script>
 </body>
 </html>
