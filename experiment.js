@@ -110,7 +110,8 @@ const demographics = {
         participant_id: participantId, 
         group: group,
         phase: 'demographics'
-    }
+    },
+    button_label: 'Przejdź dalej' // Wymaga kliknięcia przycisku
 };
 
 // Listy słów
@@ -266,46 +267,83 @@ const mathTasks = [
 const mathTrials = [];
 for (let i = 0; i < mathTasks.length; i++) {
     const mathTrial = {
-        type: jsPsychSurveyText,
-        questions: [
-            { 
-                prompt: `${mathTasks[i].question}`, 
-                name: `math_${i}`, 
-                required: true, 
-                input_type: 'number',
-                validate: function(value) {
-                    if (isNaN(value) || value === '') {
-                        return 'Proszę wpisać liczbę.';
+        timeline: [
+            {
+                type: jsPsychSurveyText,
+                questions: [
+                    { 
+                        prompt: `${mathTasks[i].question}`, 
+                        name: `math_${i}`, 
+                        required: true, 
+                        input_type: 'number',
+                        validate: function(value) {
+                            if (isNaN(value) || value === '') {
+                                return 'Proszę wpisać liczbę.';
+                            }
+                            return true;
+                        }
                     }
-                    return true;
-                }
+                ],
+                data: { 
+                    participant_id: participantId, 
+                    group: group, 
+                    math_question: mathTasks[i].question, 
+                    correct_answer: mathTasks[i].answer,
+                    phase: 'math'
+                },
+                button_label: 'Sprawdź odpowiedź' // Wymaga kliknięcia przycisku
+            },
+            {
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: function() {
+                    const lastTrialData = jsPsych.data.getLastTrialData().values()[0];
+                    const response = lastTrialData.responses[`math_${i}`];
+                    const correctAnswer = mathTasks[i].answer;
+                    if (response === correctAnswer) {
+                        return '<p>Poprawna odpowiedź!</p>';
+                    } else {
+                        return '<p>Spróbuj ponownie.</p>';
+                    }
+                },
+                choices: ['no_response'],
+                trial_duration: 2000,
+                response_ends_trial: false
             }
         ],
-        data: { 
-            participant_id: participantId, 
-            group: group, 
-            math_question: mathTasks[i].question, 
-            correct_answer: mathTasks[i].answer,
-            phase: 'math'
-        },
-        on_finish: function(data) {
-            const response = data.responses[`math_${i}`];
+        conditional_function: function() {
+            const lastTrialData = jsPsych.data.getLastTrialData().values()[0];
+            if (!lastTrialData.responses) return true; // Pierwsze uruchomienie triala
+            const response = lastTrialData.responses[`math_${i}`];
             const correctAnswer = mathTasks[i].answer;
-            if (response !== correctAnswer) {
-                jsPsych.getCurrentTimeline().insert({
-                    type: jsPsychHtmlKeyboardResponse,
-                    stimulus: '<p>Spróbuj ponownie.</p>',
-                    choices: ['no_response'],
-                    trial_duration: 2000,
-                    response_ends_trial: false
-                });
-                jsPsych.getCurrentTimeline().insert(mathTrial);
-            }
+            return response !== correctAnswer; // Powtórz, jeśli odpowiedź jest błędna
+        },
+        loop_function: function(data) {
+            const lastTrialData = data.values()[0];
+            const response = lastTrialData.responses[`math_${i}`];
+            const correctAnswer = mathTasks[i].answer;
+            return response !== correctAnswer; // Powtarzaj, dopóki odpowiedź nie jest poprawna
         }
     };
     mathTrials.push(mathTrial);
 }
 timeline.push(...mathTrials);
+
+// Zapis pośredni po zadaniach matematycznych
+const saveMathData = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: '<p>Zapisuję dane...</p>',
+    choices: ['no_response'],
+    trial_duration: 1000,
+    response_ends_trial: false,
+    on_finish: function() {
+        const data = jsPsych.data.get();
+        const narrationData = data.filter({ phase: 'narration' }).csv();
+        if (narrationData.split('\n').length > 1) {
+            saveDataToOSF(narrationData, `results_${group}_${participantId}_narration.csv`);
+        }
+    }
+};
+timeline.push(saveMathData);
 
 // Faza rozpoznawania
 const recognitionInstructions = {
@@ -377,7 +415,8 @@ for (let k = 0; k < shuffledRecognitionWords.length; k++) {
             word: word,
             word_order: wordIndexMap[word],
             phase: 'confidence'
-        }
+        },
+        button_label: 'Przejdź dalej' // Wymaga kliknięcia przycisku
     };
     recognitionTrials.push(recognitionTrial, confidenceTrial);
 }
