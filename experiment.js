@@ -106,7 +106,6 @@ const timeline = [];
 const participantId = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 15);
 const group = assignToGroup();
 
-// Instrukcje początkowe
 const instructions = {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: `
@@ -119,13 +118,15 @@ const instructions = {
     choices: ['space', 'escape'],
     on_finish: function(data) {
         console.log("Naciśnięto klawisz:", data.response);
+        console.log("Pełne dane:", data); // Dodajemy pełne dane dla debugowania
         if (data.response === 'escape') {
             jsPsych.endExperiment('Eksperyment zakończony przez użytkownika.');
+        } else if (data.response === 'space') {
+            console.log("Przechodzę do następnego kroku...");
         }
     }
 };
 timeline.push(instructions);
-
 // Dane demograficzne
 const demographics = {
     type: jsPsychSurveyText,
