@@ -59,7 +59,12 @@ const mathTasks = [
 // Inicjalizacja jsPsych
 const jsPsych = initJsPsych({
     on_finish: function() {
-        saveDataToOSF(jsPsych.data.get().csv());
+        const data = jsPsych.data.get().csv();
+        if (data.trim() !== "") {
+            saveDataToOSF(data);
+        } else {
+            console.log("Brak danych do zapisania.");
+        }
     }
 });
 
@@ -79,7 +84,9 @@ async function saveDataToOSF(data) {
                 'Accept': '*/*'
             },
             body: JSON.stringify({
-                experimentID: 'nIbjy3keQoaX', // Wstaw tutaj swój Experiment ID z DataPipe
+                experimentID: 'nIbjy3keQoaX
+
+', // Wstaw tutaj swój Experiment ID z DataPipe
                 filename: filename,
                 data: data
             })
@@ -101,8 +108,9 @@ const timeline = [];
 const participantId = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 15);
 const group = assignToGroup();
 
+// Instrukcje początkowe
 const instructions = {
-    type: "html-keyboard-response",
+    type: jsPsychHtmlKeyboardResponse,
     stimulus: `
         <h2>Witamy w badaniu naukowym</h2>
         <p>Wszystkie dane są anonimowe i będą wykorzystywane wyłącznie do celów naukowych.</p>
@@ -112,7 +120,7 @@ const instructions = {
     `,
     choices: ['space', 'escape'],
     on_finish: function(data) {
-        console.log("Naciśnięto klawisz:", data.response); // Dodajemy logowanie
+        console.log("Naciśnięto klawisz:", data.response);
         if (data.response === 'escape') {
             jsPsych.endExperiment('Eksperyment zakończony przez użytkownika.');
         }
