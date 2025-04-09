@@ -4,8 +4,27 @@ const jsPsych = initJsPsych({
         const data = jsPsych.data.get();
         const dataArray = data.values();
         if (dataArray.length > 0) {
-            const csvData = data.csv();
-            saveDataToOSF(csvData, `results_${participantId}.csv`);
+            // Przygotowanie głównej tabeli danych
+            let csvData = data.csv();
+
+            // Przygotowanie tabeli RecognitionRatings
+            const recognitionData = data.filter({ phase: 'recognition' });
+            const confidenceData = data.filter({ phase: 'confidence' });
+            let recognitionRatings = "RecognitionRatings\nword,response,confidence\n";
+
+            recognitionData.forEach((recTrial, index) => {
+                const word = recTrial.word;
+                const response = recTrial.response === "0" ? "Tak" : "Nie";
+                const confTrial = confidenceData.values()[index];
+                const confidence = confTrial.response.match(/\d/)[0]; // Wyciąga cyfrę z {"confidence_<słowo>":X}
+                recognitionRatings += `${word},${response},${confidence}\n`;
+            });
+
+            // Połączenie głównej tabeli i RecognitionRatings
+            csvData += "\n\n" + recognitionRatings;
+
+            // Zapis danych z nazwą pliku zawierającą grupę
+            saveDataToOSF(csvData, `results_${group}_${participantId}.csv`);
         } else {
             console.log("Brak danych do zapisania (brak rekordów).");
         }
