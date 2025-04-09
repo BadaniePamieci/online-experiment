@@ -1,3 +1,5 @@
+console.log("Rozpoczynam ładowanie experiment.js");
+
 // Dane eksperymentu
 const wordLists = {
     "LEKARZ": ["choroba", "pielęgniarka", "stetoskop", "doktor", "kitel", "pomoc", "fartuch", "szpital", "słuchawki", "recepta", "specjalista", "zdrowie", "pediatra", "pacjent", "lek"],
@@ -29,6 +31,8 @@ const narratives = {
     }
 };
 
+console.log("Dane eksperymentu załadowane");
+
 // Losowa kolejność list
 const listOrder = jsPsych.randomization.shuffle(["LEKARZ", "ŻYCZENIE", "WYSOKI", "GWIZDEK"]);
 const groups = {
@@ -36,6 +40,8 @@ const groups = {
     "non_critical": ["non_critical", "non_critical", "non_critical", "non_critical"],
     "neutral": ["neutral", "neutral", "neutral", "neutral"]
 };
+
+console.log("Listy i grupy zdefiniowane");
 
 // Lista słów do fazy rozpoznawania
 const fullRecognitionList = [
@@ -57,6 +63,8 @@ fullRecognitionList.forEach((word, index) => {
     wordIndexMap[word] = index;
 });
 
+console.log("Lista słów do rozpoznawania zdefiniowana");
+
 // Zadania matematyczne (5 prostych mnożeń)
 const mathTasks = [
     { question: "2 × 3 =", answer: 6 },
@@ -66,9 +74,12 @@ const mathTasks = [
     { question: "8 × 2 =", answer: 16 }
 ];
 
+console.log("Zadania matematyczne zdefiniowane");
+
 // Funkcja zapisu danych na OSF
 async function saveDataToOSF(data, filename) {
     try {
+        console.log("Zapisuję dane do OSF:", filename);
         const response = await fetch('https://pipe.jspsych.org/api/data', {
             method: 'POST',
             headers: {
@@ -84,6 +95,7 @@ async function saveDataToOSF(data, filename) {
         if (!response.ok) {
             throw new Error('Błąd zapisu danych na OSF: ' + response.statusText);
         }
+        console.log("Dane zapisane pomyślnie:", filename);
         return response.json();
     } catch (error) {
         console.error('Wystąpił błąd podczas zapisywania danych:', error);
@@ -91,12 +103,15 @@ async function saveDataToOSF(data, filename) {
     }
 }
 
+console.log("Funkcja saveDataToOSF zdefiniowana");
+
 // Inicjalizacja jsPsych
 const participantId = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 15);
 const group = assignToGroup();
 
 const jsPsych = initJsPsych({
     on_finish: function() {
+        console.log("Eksperyment zakończony, zapisuję dane...");
         const data = jsPsych.data.get();
         const dataArray = data.values();
         if (dataArray.length > 0) {
@@ -124,11 +139,15 @@ const jsPsych = initJsPsych({
     use_webaudio: false
 });
 
+console.log("jsPsych zainicjalizowany");
+
 // Funkcja przypisania do grupy
 function assignToGroup() {
     const groupNames = Object.keys(groups);
     return groupNames[Math.floor(Math.random() * groupNames.length)];
 }
+
+console.log("Funkcja assignToGroup zdefiniowana");
 
 // Globalny listener dla ESC
 document.addEventListener('keydown', function(event) {
@@ -138,8 +157,12 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
+console.log("Listener ESC dodany");
+
 // Timeline eksperymentu
 const timeline = [];
+
+console.log("Timeline zainicjalizowany");
 
 // Instrukcje początkowe
 const instructions = {
@@ -154,11 +177,13 @@ const instructions = {
     choices: ['Przejdź dalej'],
     data: { phase: 'instructions' },
     on_finish: function(data) {
-        console.log("Kliknięto przycisk:", data.response);
+        console.log("Kliknięto przycisk w instrukcjach:", data.response);
         console.log("Pełne dane:", data);
     }
 };
 timeline.push(instructions);
+
+console.log("Instrukcje dodane do timeline");
 
 // Dane demograficzne
 const demographics = {
@@ -168,14 +193,21 @@ const demographics = {
         { prompt: "Podaj swoją płeć (Kobieta, Mężczyzna, Inna, Wolę nie podawać):", name: 'gender', required: true }
     ],
     data: { participant_id: participantId, group: group, phase: 'demographics' },
-    button_label: 'Przejdź dalej' // Wymaga kliknięcia przycisku
+    button_label: 'Przejdź dalej',
+    on_finish: function(data) {
+        console.log("Dane demograficzne zapisane:", data);
+    }
 };
 timeline.push(demographics);
+
+console.log("Dane demograficzne dodane do timeline");
 
 // Listy słów i narracje
 for (let i = 0; i < listOrder.length; i++) {
     const listName = listOrder[i];
     const wordList = wordLists[listName];
+
+    console.log(`Przetwarzam listę ${listName}`);
 
     // Wyświetlenie listy słów
     for (const word of wordList) {
@@ -190,6 +222,8 @@ for (let i = 0; i < listOrder.length; i++) {
         };
         timeline.push(wordTrial);
     }
+
+    console.log(`Słowa z listy ${listName} dodane do timeline`);
 
     // Narracja
     const narrationType = groups[group][i];
@@ -233,6 +267,8 @@ for (let i = 0; i < listOrder.length; i++) {
         timeline.push(sentenceTrial);
     }
 
+    console.log(`Narracja dla listy ${listName} dodana do timeline`);
+
     // Przerwa między listami (oprócz ostatniej)
     if (i < listOrder.length - 1) {
         const breakTrial = {
@@ -252,6 +288,8 @@ for (let i = 0; i < listOrder.length; i++) {
         timeline.push(breakTrial);
     }
 }
+
+console.log("Listy słów i narracje dodane do timeline");
 
 // Zadania matematyczne
 const mathIntro = {
@@ -282,10 +320,15 @@ for (let i = 0; i < mathTasks.length; i++) {
             correct_answer: mathTasks[i].answer,
             phase: 'math'
         },
-        button_label: 'Przejdź dalej' // Wymaga kliknięcia przycisku
+        button_label: 'Przejdź dalej',
+        on_finish: function(data) {
+            console.log(`Zadanie matematyczne ${i + 1} zakończone:`, data);
+        }
     };
     timeline.push(mathTrial);
 }
+
+console.log("Zadania matematyczne dodane do timeline");
 
 // Faza rozpoznawania
 const recognitionIntro = {
@@ -322,6 +365,9 @@ for (const word of shuffledRecognitionList) {
                       wordLists[listOrder[3]].includes(word) ||
                       ['lekarz', 'życzenie', 'wysoki', 'gwizdek'].includes(word),
             phase: 'recognition'
+        },
+        on_finish: function(data) {
+            console.log(`Rozpoznawanie słowa ${word}:`, data);
         }
     };
     timeline.push(recognitionTrial);
@@ -343,10 +389,15 @@ for (const word of shuffledRecognitionList) {
             word_order: wordIndexMap[word],
             phase: 'confidence'
         },
-        button_label: 'Przejdź dalej' // Wymaga kliknięcia przycisku
+        button_label: 'Przejdź dalej',
+        on_finish: function(data) {
+            console.log(`Pewność dla słowa ${word}:`, data);
+        }
     };
     timeline.push(confidenceTrial);
 }
+
+console.log("Faza rozpoznawania dodana do timeline");
 
 // Zakończenie eksperymentu
 const endMessage = {
@@ -357,9 +408,16 @@ const endMessage = {
         <p>Kliknij przycisk, aby zakończyć.</p>
     `,
     choices: ['Zakończ'],
-    data: { phase: 'instructions' }
+    data: { phase: 'instructions' },
+    on_finish: function(data) {
+        console.log("Eksperyment zakończony przez użytkownika:", data);
+    }
 };
 timeline.push(endMessage);
 
+console.log("Zakończenie dodane do timeline");
+
 // Uruchomienie eksperymentu
+console.log("Uruchamiam eksperyment...");
 jsPsych.run(timeline);
+console.log("Eksperyment uruchomiony");
