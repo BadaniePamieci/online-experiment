@@ -1,92 +1,6 @@
-// Dane eksperymentu
-const wordLists = {
-    "LEKARZ": ["choroba", "pielęgniarka", "stetoskop", "doktor", "kitel", "pomoc", "fartuch", "szpital", "słuchawki", "recepta", "specjalista", "zdrowie", "pediatra", "pacjent", "lek"],
-    "WYSOKI": ["niski", "mężczyzna", "chłopak", "brunet", "dąb", "koszykarz", "poziom", "słup", "przystojny", "budynek", "siatkarz", "szczupły", "długi", "wieżowiec", "drabina"],
-    "ŻYCZENIE": ["marzenie", "prezent", "urodziny", "ostatnie", "rozkaz", "święta", "kartka", "magia", "spełnienie", "wróżba", "rybka", "nadzieja", "prośba", "gwiazdka", "pragnienie"],
-    "GWIZDEK": ["mecz", "w-f", "sędzia", "głośny", "hałas", "trener", "koniec", "dźwięk", "sport", "policjant", "gwizd", "czajnik", "świst", "sygnał", "piłka"]
-};
-
-const narratives = {
-    "LEKARZ": {
-        "critical": "Wyobraź sobie, że siedzisz w zatłoczonej poczekalni szpitala. Przez uchylone drzwi gabinetu widzisz pielęgniarkę, która pobiera krew nastolatkowi. W pomieszczeniu obok ktoś ubrany na biało słucha staruszki opisującej kaszel. Przez korytarz przechodzi pacjent z receptą w dłoni, którą wypisał mu ktoś przed chwilą. Czekasz na pomoc, a chłodne powietrze i stukot klawiatur sprawiają, że chcesz jak najszybciej iść do domu.",
-        "non_critical": "Wyobraź sobie, że siedzisz w zatłoczonej poczekalni szpitala. Przez uchylone drzwi gabinetu widzisz pielęgniarkę, która pobiera krew nastolatkowi. Przez korytarz przechodzi pacjent z czymś w ręku. To pewnie recepta, na leki, których koniecznie potrzebuje. Czekasz na pomoc, a chłodne powietrze i stukot klawiatur sprawiają, że chcesz jak najszybciej iść do domu.",
-        "neutral": "Wyobraź sobie, że siedzisz w cichej czytelni biblioteki. Przez półotwarte drzwi widzisz osobę układającą książki na półce. Obok Ciebie studentka przewraca strony notesu, szukając ważnego cytatu. Na środku stolik z gazetami, a przez okno wpada ciepłe światło poranka. Czekasz na otwarcie archiwum, a szelest papieru i zapach kawy sprawiają, że czujesz się wspaniale."
-    },
-    "WYSOKI": {
-        "critical": "Wyobraź sobie, że przechodzisz przez park w centrum miasta. Obok ciebie mężczyzna w koszulce sportowej przygotowuje się do gry. Wielki koszykarz rozciąga się przed meczem, opierając dłonie o słup, który sięga ponad korony drzew. Dookoła parku stoją ogromne wieżowce o szklanych fasadach, rzucające cień na całą okolicę. Zastanawiasz się, jak ludzie wznoszą takie budynki, które wydają się dotykać nieba.",
-        "non_critical": "Wyobraź sobie, że przechodzisz przez park w centrum miasta. Obok ciebie mężczyzna w koszulce sportowej przygotowuje się do gry. Koszykarz rozciąga się przed meczem, opierając dłonie o słup, który stoi przy boisku. Dookoła parku stoją wieżowce o szklanych fasadach, rzucające cień na całą okolicę. Jesteś zachwycony ich wykonaniem i zastanawiasz się, jak ludzie wznoszą takie budynki.",
-        "neutral": "Wyobraź sobie, że siedzisz w kawiarni na starym rynku. Przez okno obserwujesz turystów fotografujących fontannę z posągiem Neptuna. Kelnerka w fartuchu w kratkę nalewa Ci herbatę do filiżanki z motywem kotów. Zapach świeżo mielonej kawy miesza się z dźwiękiem delikatnego jazzu, a Ty zastanawiasz się, czy wybrać sernik czy makowiec."
-    },
-    "ŻYCZENIE": {
-        "critical": "Wyobraź sobie, że siedzisz przy stole wigilijnym. Na choince migocze gwiazdka, a pod nią leży prezent owinięty w złoty papier. Babcia cieszy się z magii świąt i z tego, że wszyscy przyjechali do niej. Podchodzicie do siebie i mówicie sobie miłe słowa na nowy rok. W kącie stoi talerz z ciasteczkami z wróżbą, które mają zdecydować o Twojej przyszłości, chociaż sam w to nie wierzysz. Wolisz dzielić się opłatkiem i mówić, czego pragniesz dla bliskich.",
-        "non_critical": "Wyobraź sobie, że siedzisz przy stole wigilijnym. Na choince migocze gwiazdka, a pod nią leży prezent owinięty w złoty papier. Babcia cieszy się z magii świąt i z tego, że wszyscy przyjechali do niej. Podchodzi do ciebie i całuje cię w policzek. W kącie stoi talerz z ciasteczkami z wróżbą, które mają zdecydować o Twojej przyszłości, chociaż sam w to nie wierzysz. Otwierasz jedno i z uśmiechem je czytasz.",
-        "neutral": "Wyobraź sobie, że stoisz na stacji benzynowej o północy. Na półce leżą przekąski i napoje, a kasjerka w niebieskim uniformie rozmawia przez telefon. W powietrzu unosi się zapach gumy i oleju. Kupujesz batonik i zastanawiasz się, czy zdążysz dojechać do domu. Masz nadzieję, że ktoś na ciebie poczeka, bo nie masz klucza od domu."
-    },
-    "GWIZDEK": {
-        "critical": "Wyobraź sobie, że jesteś na sali gimnastycznej podczas w-f. Trener krzyczy, byście ustawili się w rzędzie. Słyszysz wysoki dźwięk na zewnątrz i nie skupiasz się na lekcji. Za oknem dostrzegasz policjanta, który kieruje ruchem po wypadku samochodowym, wydając ostre dźwięki. Zapatrzony w okno słyszysz niechciany sygnał, i wiesz, że musisz zacząć biegać okrążenia.",
-        "non_critical": "Wyobraź sobie, że jesteś na sali gimnastycznej podczas w-f. Trener krzyczy, byście ustawili się w rzędzie. Ty jednak nie skupiasz się na lekcji, bo za oknem dostrzegasz policjanta, który kieruje ruchem po wypadku samochodowym. Zapatrzony w okno słyszysz dźwięk trenera, który mówi, że musisz się skupić. To twój sygnał, żeby nie patrzeć więcej przez okno.",
-        "neutral": "Wyobraź sobie, że przeglądasz stare zdjęcia w albumie na poddaszu babci. Kurz unosi się w promieniach słońca wpadających przez okno, a na półkach stoją pudełka z porcelanowymi figurkami. Na jednym ze zdjęć widzisz siebie jako dziecko, trzymającego pluszowego misia w kapeluszu. Pachnie tu lawendą i starą drewnianą podłogą. Zastanawiasz się, czy zabrać któreś zdjęcie do ramki."
-    }
-};
-
-const listOrder = ["LEKARZ", "ŻYCZENIE", "WYSOKI", "GWIZDEK"];
-const groups = {
-    "critical": ["critical", "critical", "critical", "critical"],
-    "non_critical": ["non_critical", "non_critical", "non_critical", "non_critical"],
-    "neutral": ["neutral", "neutral", "neutral", "neutral"]
-};
-
-// Lista 30 słów do fazy rozpoznawania
-const fullRecognitionList = [
-    "stetoskop", "kitel", "fartuch", "słuchawki", "pediatra",  // LEKARZ
-    "urodziny", "rozkaz", "kartka", "spełnienie", "prośba",    // ŻYCZENIE
-    "chłopak", "dąb", "poziom", "przystojny", "długi",         // WYSOKI
-    "sędzia", "hałas", "koniec", "sport", "piłka",             // GWIZDEK
-    "lekarz", "życzenie", "wysoki", "gwizdek",                 // Słowa krytyczne
-    "apteka", "most", "balon", "telewizor", "księżyc",         // Dystraktory
-    "piasek", "motyl", "laptop", "rower", "zegar"              // Dystraktory
-];
-
-// Zadania matematyczne (5 prostych mnożeń)
-const mathTasks = [
-    { question: "2 × 3 =", answer: 6 },
-    { question: "4 × 5 =", answer: 20 },
-    { question: "3 × 7 =", answer: 21 },
-    { question: "5 × 6 =", answer: 30 },
-    { question: "8 × 2 =", answer: 16 }
-];
-
-// Inicjalizacja jsPsych
-const jsPsych = initJsPsych({
-    on_finish: function() {
-        const data = jsPsych.data.get();
-        const dataArray = data.values();
-        if (dataArray.length > 0) {
-            const csvData = data.csv();
-            saveDataToOSF(csvData);
-        } else {
-            console.log("Brak danych do zapisania (brak rekordów).");
-        }
-    },
-    use_webaudio: false
-});
-
-// Globalny listener dla ESC
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        console.log("Naciśnięto ESC – kończę eksperyment.");
-        jsPsych.endExperiment('Eksperyment zakończony przez użytkownika.');
-    }
-});
-
-// Funkcje pomocnicze
-function assignToGroup() {
-    const groupNames = Object.keys(groups);
-    return groupNames[Math.floor(Math.random() * groupNames.length)];
-}
-
-async function saveDataToOSF(data) {
-    const filename = `results_${new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 15)}.csv`;
+// Funkcja do zapisu danych na OSF
+async function saveDataToOSF(data, filename) {
+    console.log("Próba zapisu danych:", data);
     try {
         const response = await fetch('https://pipe.jspsych.org/api/data', {
             method: 'POST',
@@ -95,27 +9,56 @@ async function saveDataToOSF(data) {
                 'Accept': '*/*'
             },
             body: JSON.stringify({
-                experimentID: 'nIbjy3keQoaX', // Wstaw tutaj swój Experiment ID z DataPipe
+                experimentID: 'nIbjy3keQoaX',
                 filename: filename,
                 data: data
             })
         });
+        console.log("Odpowiedź z DataPipe:", response);
         if (!response.ok) {
             throw new Error('Błąd zapisu danych na OSF: ' + response.statusText);
         }
-        return response.json();
+        const result = await response.json();
+        console.log("Wynik zapisu:", result);
+        return result;
     } catch (error) {
         console.error('Wystąpił błąd podczas zapisywania danych:', error);
         alert('Wystąpił problem z zapisem danych. Skontaktuj się z badaczem.');
     }
 }
 
-// Timeline eksperymentu
-const timeline = [];
-
-// Dane uczestnika
+// Inicjalizacja jsPsych
 const participantId = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 15);
-const group = assignToGroup();
+const group = 'critical'; // Możesz zmienić na 'neutral' w zależności od grupy
+
+const jsPsych = initJsPsych({
+    on_finish: function() {
+        const data = jsPsych.data.get();
+        const dataArray = data.values();
+        if (dataArray.length > 0) {
+            // Dane z narracji (sentence trials)
+            const narrationData = data.filter({ phase: 'narration' }).csv();
+            if (narrationData.split('\n').length > 1) {
+                saveDataToOSF(narrationData, `results_${group}_${participantId}_narration.csv`);
+            }
+
+            // Dane z fazy rozpoznawania (recognition trials)
+            const recognitionData = data.filter({ phase: 'recognition' }).csv();
+            if (recognitionData.split('\n').length > 1) {
+                saveDataToOSF(recognitionData, `results_${group}_${participantId}_recognition.csv`);
+            }
+
+            // Dane z fazy pewności (confidence trials)
+            const confidenceData = data.filter({ phase: 'confidence' }).csv();
+            if (confidenceData.split('\n').length > 1) {
+                saveDataToOSF(confidenceData, `results_${group}_${participantId}_confidence.csv`);
+            }
+        } else {
+            console.log("Brak danych do zapisania (brak rekordów).");
+        }
+    },
+    use_webaudio: false
+});
 
 // Instrukcje początkowe
 const instructions = {
@@ -128,48 +71,125 @@ const instructions = {
         <p>(Naciśnij ESC, aby wyjść w dowolnym momencie)</p>
     `,
     choices: ['Przejdź dalej'],
+    data: { phase: 'instructions' },
     on_finish: function(data) {
         console.log("Kliknięto przycisk:", data.response);
         console.log("Pełne dane:", data);
     }
 };
-timeline.push(instructions);
 
-// Dane demograficzne
+// Metryczka
 const demographics = {
     type: jsPsychSurveyText,
     questions: [
-        { prompt: "Podaj swój wiek:", name: 'age', required: true, input_type: 'number' },
-        { prompt: "Podaj swoją płeć (Kobieta, Mężczyzna, Inna, Wolę nie podawać):", name: 'gender', required: true }
+        { 
+            prompt: 'Wiek (w latach):', 
+            name: 'age', 
+            required: true, 
+            input_type: 'number',
+            validate: function(value) {
+                if (isNaN(value) || value < 0 || value > 120) {
+                    return 'Proszę wpisać poprawny wiek (0-120 lat).';
+                }
+                return true;
+            }
+        },
+        { 
+            prompt: 'Płeć (K, M, I):', 
+            name: 'gender', 
+            required: true, 
+            validate: function(value) {
+                if (!['K', 'M', 'I'].includes(value.toUpperCase()) || value.length !== 1) {
+                    return 'Proszę wpisać K, M lub I.';
+                }
+                return true;
+            }
+        }
     ],
-    data: { participant_id: participantId, group: group }
+    data: { 
+        participant_id: participantId, 
+        group: group,
+        phase: 'demographics'
+    }
 };
-timeline.push(demographics);
 
-// Listy słów i narracje
+// Listy słów
+const wordLists = [
+    ['choroba', 'pielęgniarka', 'stetoskop', 'doktor', 'kitel', 'pomoc', 'fartuch', 'szpital', 'słuchawki', 'recepta', 'specjalista', 'zdrowie', 'pediatra', 'pacjent', 'lek'], // LEKARZ
+    ['marzenie', 'prezent', 'urodziny', 'ostatnie', 'rozkaz', 'święta', 'kartka', 'magia', 'spełnienie', 'wróżba', 'rybka', 'nadzieja', 'prośba', 'gwiazdka', 'pragnienie'], // ŻYCZENIE
+    ['niski', 'mężczyzna', 'chłopak', 'brunet', 'dąb', 'koszykarz', 'poziom', 'słup', 'przystojny', 'budynek', 'siatkarz', 'szczupły', 'długi', 'wieżowiec', 'drabina'], // WYSOKI
+    ['mecz', 'w-f', 'sędzia', 'głośny', 'hałas', 'trener', 'koniec', 'dźwięk', 'sport', 'policjant', 'gwizd', 'czajnik', 'świst', 'sygnał', 'piłka'] // GWIZDEK
+];
+
+// Narracje
+const narratives = [
+    [
+        'Wyobraź sobie, że siedzisz w zatłoczonej poczekalni szpitala.',
+        'Przez uchylone drzwi gabinetu widzisz pielęgniarkę, która pobiera krew nastolatkowi.',
+        'W pomieszczeniu obok ktoś ubrany na biało słucha staruszki opisującej kaszel.',
+        'Przez korytarz przechodzi pacjent z receptą w dłoni, którą wypisał mu ktoś przed chwilą.',
+        'Czekasz na pomoc, a chłodne powietrze i stukot klawiatur sprawiają, że chcesz jak najszybciej iść do domu.'
+    ],
+    [
+        'Wyobraź sobie, że siedzisz przy stole wigilijnym.',
+        'Na choince migocze gwiazdka, a pod nią leży prezent owinięty w złoty papier.',
+        'Babcia cieszy się z magii świąt i z tego, że wszyscy przyjechali do niej.',
+        'Podchodzicie do siebie i mówicie sobie miłe słowa na nowy rok.',
+        'W kącie stoi talerz z ciasteczkami z wróżbą, które mają zdecydować o Twojej przyszłości, chociaż sam w to nie wierzysz.',
+        'Wolisz dzielić się opłatkiem i mówić, czego pragniesz dla bliskich.'
+    ],
+    [
+        'Wyobraź sobie, że przechodzisz przez park w centrum miasta.',
+        'Obok ciebie mężczyzna w koszulce sportowej przygotowuje się do gry.',
+        'Wielki koszykarz rozciąga się przed meczem, opierając dłonie o słup, który sięga ponad korony drzew.',
+        'Dookoła parku stoją ogromne wieżowce o szklanych fasadach, rzucające cień na całą okolicę.',
+        'Zastanawiasz się, jak ludzie wznoszą takie budynki, które wydają się dotykać nieba.'
+    ],
+    [
+        'Wyobraź sobie, że jesteś na sali gimnastycznej podczas w-f.',
+        'Trener krzyczy, byście ustawili się w rzędzie.',
+        'Słyszysz wysoki dźwięk na zewnątrz i nie skupiasz się na lekcji.',
+        'Za oknem dostrzegasz policjanta, który kieruje ruchem po wypadku samochodowym, wydając ostre dźwięki.',
+        'Zapatrzony w okno słyszysz niechciany sygnał, i wiesz, że musisz zacząć biegać okrążenia.'
+    ]
+];
+
+// Losowa kolejność list
+const listOrder = jsPsych.randomization.shuffle([0, 1, 2, 3]);
+const listNames = ['LEKARZ', 'ŻYCZENIE', 'WYSOKI', 'GWIZDEK'];
+
+// Tworzenie timeline dla list słów i narracji
+const timeline = [instructions, demographics];
+
 for (let i = 0; i < listOrder.length; i++) {
-    const listName = listOrder[i];
-    const wordList = wordLists[listName];
+    const listIndex = listOrder[i];
+    const listName = listNames[listIndex];
+    const words = wordLists[listIndex];
+    const sentences = narratives[listIndex];
 
-    // Wyświetlenie listy słów
-    for (const word of wordList) {
+    // Wyświetlanie słów
+    for (let j = 0; j < words.length; j++) {
+        const word = words[j];
         const wordTrial = {
             type: jsPsychHtmlKeyboardResponse,
             stimulus: `<h1>${word}</h1>`,
-            choices: ['no_response'], // Brak odpowiedzi, tylko ESC działa
+            choices: ['no_response'],
             trial_duration: 1000,
             response_ends_trial: false,
             post_trial_gap: 500,
-            data: { participant_id: participantId, group: group, list_name: listName, trial_number: i + 1, word: word }
+            data: { 
+                participant_id: participantId, 
+                group: group, 
+                list_name: listName, 
+                trial_number: i + 1, 
+                word: word,
+                phase: 'word_list'
+            }
         };
         timeline.push(wordTrial);
     }
 
-    // Narracja
-    const narrationType = groups[group][i];
-    const narrationText = narratives[listName][narrationType];
-    const sentences = narrationText.split('.').map(s => s.trim()).filter(s => s);
-
+    // Instrukcja przed narracją
     const narrationInstructions = {
         type: jsPsychHtmlButtonResponse,
         stimulus: `
@@ -178,12 +198,11 @@ for (let i = 0; i < listOrder.length; i++) {
             <p>(Naciśnij ESC, aby wyjść)</p>
         `,
         choices: ['Przejdź dalej'],
-        on_finish: function(data) {
-            console.log("Kliknięto przycisk w narracji:", data.response);
-        }
+        data: { phase: 'instructions' }
     };
     timeline.push(narrationInstructions);
 
+    // Wyświetlanie narracji
     for (let j = 0; j < sentences.length; j++) {
         const sentenceTrial = {
             type: jsPsychHtmlButtonResponse,
@@ -199,7 +218,8 @@ for (let i = 0; i < listOrder.length; i++) {
                 list_name: listName, 
                 trial_number: i + 1, 
                 sentence_number: j + 1, 
-                sentence: sentences[j] 
+                sentence: sentences[j],
+                phase: 'narration'
             }
         };
         timeline.push(sentenceTrial);
@@ -216,16 +236,14 @@ for (let i = 0; i < listOrder.length; i++) {
                 <p>(Naciśnij ESC, aby wyjść)</p>
             `,
             choices: ['Przejdź dalej'],
-            on_finish: function(data) {
-                console.log("Kliknięto przycisk w przerwie:", data.response);
-            }
+            data: { phase: 'instructions' }
         };
         timeline.push(breakTrial);
     }
 }
 
 // Zadania matematyczne
-const mathIntro = {
+const mathInstructions = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
         <p>Teraz rozwiąż kilka prostych zadań matematycznych.</p>
@@ -233,30 +251,64 @@ const mathIntro = {
         <p>(Naciśnij ESC, aby wyjść)</p>
     `,
     choices: ['Przejdź dalej'],
-    on_finish: function(data) {
-        console.log("Kliknięto przycisk w mathIntro:", data.response);
-    }
+    data: { phase: 'instructions' }
 };
-timeline.push(mathIntro);
+timeline.push(mathInstructions);
 
+const mathTasks = [
+    { question: '2 + 3 × 4 =', answer: '14' },
+    { question: '5 × 2 + 1 =', answer: '11' },
+    { question: '3 + 4 × 2 =', answer: '11' },
+    { question: '1 × 3 + 5 =', answer: '8' },
+    { question: '4 + 2 × 3 =', answer: '10' }
+];
+
+const mathTrials = [];
 for (let i = 0; i < mathTasks.length; i++) {
     const mathTrial = {
         type: jsPsychSurveyText,
         questions: [
-            { prompt: `${mathTasks[i].question}`, name: `math_${i}`, required: true, input_type: 'number' }
+            { 
+                prompt: `${mathTasks[i].question}`, 
+                name: `math_${i}`, 
+                required: true, 
+                input_type: 'number',
+                validate: function(value) {
+                    if (isNaN(value) || value === '') {
+                        return 'Proszę wpisać liczbę.';
+                    }
+                    return true;
+                }
+            }
         ],
         data: { 
             participant_id: participantId, 
             group: group, 
             math_question: mathTasks[i].question, 
-            correct_answer: mathTasks[i].answer 
+            correct_answer: mathTasks[i].answer,
+            phase: 'math'
+        },
+        on_finish: function(data) {
+            const response = data.responses[`math_${i}`];
+            const correctAnswer = mathTasks[i].answer;
+            if (response !== correctAnswer) {
+                jsPsych.getCurrentTimeline().insert({
+                    type: jsPsychHtmlKeyboardResponse,
+                    stimulus: '<p>Spróbuj ponownie.</p>',
+                    choices: ['no_response'],
+                    trial_duration: 2000,
+                    response_ends_trial: false
+                });
+                jsPsych.getCurrentTimeline().insert(mathTrial);
+            }
         }
     };
-    timeline.push(mathTrial);
+    mathTrials.push(mathTrial);
 }
+timeline.push(...mathTrials);
 
 // Faza rozpoznawania
-const recognitionIntro = {
+const recognitionInstructions = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
         <p>Teraz zobaczysz listę słów. Twoim zadaniem jest określenie, czy dane słowo pojawiło się wcześniej na którejś z list.</p>
@@ -266,16 +318,31 @@ const recognitionIntro = {
         <p>(Naciśnij ESC, aby wyjść)</p>
     `,
     choices: ['Przejdź dalej'],
-    on_finish: function(data) {
-        console.log("Kliknięto przycisk w recognitionIntro:", data.response);
-    }
+    data: { phase: 'instructions' }
 };
-timeline.push(recognitionIntro);
+timeline.push(recognitionInstructions);
 
-// Losowe przemieszanie listy słów do rozpoznawania
-const shuffledRecognitionList = jsPsych.randomization.shuffle(fullRecognitionList);
+// Lista słów do fazy rozpoznawania z indeksami
+const recognitionWords = [
+    'wysoki', 'koniec', 'most', 'lekarz', 'laptop', 'zegar', 'słuchawki', 'prośba', 'telewizor', 'hałas',
+    'apteka', 'przystojny', 'poziom', 'pediatra', 'kartka', 'balon', 'sport', 'stetoskop', 'kitel', 'fartuch',
+    'piłka', 'rower', 'motyl', 'księżyc', 'spełnienie', 'gwizdek', 'piasek', 'dąb', 'długi', 'urodziny',
+    'życzenie', 'sędzia', 'chłopak', 'rozkaz'
+];
 
-for (const word of shuffledRecognitionList) {
+// Losowa kolejność słów w fazie rozpoznawania
+const shuffledRecognitionWords = jsPsych.randomization.shuffle(recognitionWords);
+
+// Tworzenie mapy indeksów (oryginalna kolejność słów)
+const wordIndexMap = {};
+recognitionWords.forEach((word, index) => {
+    wordIndexMap[word] = index;
+});
+
+// Triale rozpoznawania
+const recognitionTrials = [];
+for (let k = 0; k < shuffledRecognitionWords.length; k++) {
+    const word = shuffledRecognitionWords[k];
     const recognitionTrial = {
         type: jsPsychHtmlButtonResponse,
         stimulus: `<h1>${word}</h1>`,
@@ -285,15 +352,15 @@ for (const word of shuffledRecognitionList) {
             participant_id: participantId, 
             group: group, 
             word: word,
+            word_order: wordIndexMap[word],
             is_target: wordLists[listOrder[0]].includes(word) || 
                       wordLists[listOrder[1]].includes(word) || 
                       wordLists[listOrder[2]].includes(word) || 
                       wordLists[listOrder[3]].includes(word) ||
-                      ['lekarz', 'życzenie', 'wysoki', 'gwizdek'].includes(word)
+                      ['lekarz', 'życzenie', 'wysoki', 'gwizdek'].includes(word),
+            phase: 'recognition'
         }
     };
-    timeline.push(recognitionTrial);
-
     const confidenceTrial = {
         type: jsPsychSurveyLikert,
         questions: [
@@ -304,22 +371,30 @@ for (const word of shuffledRecognitionList) {
                 name: `confidence_${word}` 
             }
         ],
-        data: { participant_id: participantId, group: group, word: word }
+        data: { 
+            participant_id: participantId, 
+            group: group, 
+            word: word,
+            word_order: wordIndexMap[word],
+            phase: 'confidence'
+        }
     };
-    timeline.push(confidenceTrial);
+    recognitionTrials.push(recognitionTrial, confidenceTrial);
 }
+timeline.push(...recognitionTrials);
 
-// Zakończenie eksperymentu
-const endMessage = {
+// Zakończenie
+const endScreen = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
         <h2>Dziękujemy za udział w badaniu!</h2>
         <p>Twoje dane zostały zapisane.</p>
         <p>Kliknij przycisk, aby zakończyć.</p>
     `,
-    choices: ['Zakończ']
+    choices: ['Zakończ'],
+    data: { phase: 'instructions' }
 };
-timeline.push(endMessage);
+timeline.push(endScreen);
 
 // Uruchomienie eksperymentu
 jsPsych.run(timeline);
