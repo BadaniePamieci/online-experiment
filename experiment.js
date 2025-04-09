@@ -1,9 +1,37 @@
 // Inicjalizacja jsPsych
 const jsPsych = initJsPsych({
     on_finish: function() {
-        jsPsych.data.displayData(); // Wyświetla dane w konsoli (bez zapisu na razie)
-    }
+        const data = jsPsych.data.get();
+        const dataArray = data.values();
+        if (dataArray.length > 0) {
+            const narrationData = data.filter({ phase: 'narration' }).csv();
+            if (narrationData.split('\n').length > 1) {
+                saveDataToOSF(narrationData, `results_narration_${participantId}.csv`);
+            }
+            const recognitionData = data.filter({ phase: 'recognition' }).csv();
+            if (recognitionData.split('\n').length > 1) {
+                saveDataToOSF(recognitionData, `results_recognition_${participantId}.csv`);
+            }
+        } else {
+            console.log("Brak danych do zapisania (brak rekordów).");
+        }
+    },
+    use_webaudio: false
 });
+
+// Funkcja do zapisu danych (przykładowa implementacja)
+const participantId = Math.random().toString(36).substring(2, 15);
+function saveDataToOSF(data, filename) {
+    const blob = new Blob([data], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
 
 // Dane eksperymentu
 const wordLists = {
@@ -28,15 +56,6 @@ const recognitionList = [
 // Losowe przemieszanie słów w fazie rozpoznawania
 const shuffledRecognitionList = jsPsych.randomization.shuffle(recognitionList);
 
-// Bardziej złożone zadania matematyczne
-const mathTasks = [
-    { question: "2 + 2 × 3 =", answer: 8 },  // 2 + 6 = 8
-    { question: "4 × 5 - 3 =", answer: 17 }, // 20 - 3 = 17
-    { question: "3 + 4 × 2 =", answer: 11 }, // 3 + 8 = 11
-    { question: "5 × 6 - 4 =", answer: 26 }, // 30 - 4 = 26
-    { question: "8 ÷ 2 + 3 =", answer: 7 }   // 4 + 3 = 7
-];
-
 // Timeline eksperymentu
 const timeline = [];
 
@@ -48,7 +67,8 @@ const instructions = {
         <p>Twoim zadaniem jest zapamiętanie słów z list.</p>
         <p>Kliknij poniżej, aby zacząć.</p>
     `,
-    choices: ['Rozpocznij']
+    choices: ['Rozpocznij'],
+    data: { phase: 'instructions' }
 };
 timeline.push(instructions);
 
@@ -60,11 +80,12 @@ const testInfo = {
         <p>Przygotuj się do zapamiętywania słów.</p>
         <p>Kliknij, aby kontynuować.</p>
     `,
-    choices: ['Przejdź dalej']
+    choices: ['Przejdź dalej'],
+    data: { phase: 'narration' }
 };
 timeline.push(testInfo);
 
-// Wyświetlanie list słów
+// Wyświetlanie list słów (faza narracji)
 for (let i = 0; i < listOrder.length; i++) {
     const listName = listOrder[i];
     const wordList = wordLists[listName];
@@ -76,51 +97,38 @@ for (let i = 0; i < listOrder.length; i++) {
             choices: "NO_KEYS",
             trial_duration: 1000,
             response_ends_trial: false,
-            post_trial_gap: 500
+            post_trial_gap: 500,
+            data: { phase: 'narration', list_name: listName, word: word }
         };
         timeline.push(wordTrial);
     }
 }
 
-// Zadania matematyczne
-const mathIntro = {
-    type: jsPsychHtmlButtonResponse,
-    stimulus: `
-        <p>Rozwiąż kilka zadań matematycznych.</p>
-        <p>Kliknij, aby kontynuować.</p>
-    `,
-    choices: ['Przejdź dalej']
-};
-timeline.push(mathIntro);
-
-for (const task of mathTasks) {
-    const mathTrial = {
-        type: jsPsychSurveyText,
-        questions: [
-            { prompt: task.question, name: `math_${task.question}`, required: true }
-        ]
-    };
-    timeline.push(mathTrial);
-}
-
-// Faza rozpoznawania
+// Faza rozpoznawania z skalą
 const recognitionIntro = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
         <p>Teraz ocenisz, czy słowa pojawiły się wcześniej.</p>
-        <p>Kliknij "Tak" lub "Nie".</p>
+        <p>Użyj skali od "Zdecydowanie nie" do "Zdecydowanie tak".</p>
         <p>Zacznij, klikając poniżej.</p>
     `,
-    choices: ['Przejdź dalej']
+    choices: ['Przejdź dalej'],
+    data: { phase: 'recognition' }
 };
 timeline.push(recognitionIntro);
 
 for (const word of shuffledRecognitionList) {
     const recognitionTrial = {
-        type: jsPsychHtmlButtonResponse,
-        stimulus: `<h1>${word}</h1>`,
-        choices: ['Tak', 'Nie'],
-        prompt: '<p>Czy to słowo było na liście?</p>'
+        type: jsPsychSurveyLikert,
+        questions: [
+            {
+                prompt: `<h1>${word}</h1><p>Czy to słowo było na liście?</p>`,
+                labels: ["Zdecydowanie nie", "Raczej nie", "Nie wiem", "Raczej tak", "Zdecydowanie tak"],
+                required: true,
+                name: `recognition_${word}`
+            }
+        ],
+        data: { phase: 'recognition', word: word }
     };
     timeline.push(recognitionTrial);
 }
@@ -132,7 +140,8 @@ const endMessage = {
         <h2>Dziękujemy!</h2>
         <p>Eksperyment zakończony.</p>
     `,
-    choices: ['Zakończ']
+    choices: ['Zakończ'],
+    data: { phase: 'end' }
 };
 timeline.push(endMessage);
 
