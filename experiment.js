@@ -29,7 +29,8 @@ const narratives = {
     }
 };
 
-const listOrder = ["LEKARZ", "ŻYCZENIE", "WYSOKI", "GWIZDEK"];
+// Losowa kolejność list
+const listOrder = jsPsych.randomization.shuffle(["LEKARZ", "ŻYCZENIE", "WYSOKI", "GWIZDEK"]);
 const groups = {
     "critical": ["critical", "critical", "critical", "critical"],
     "non_critical": ["non_critical", "non_critical", "non_critical", "non_critical"],
@@ -47,13 +48,16 @@ const fullRecognitionList = [
     "piasek", "motyl", "laptop", "rower", "zegar"              // Dystraktory
 ];
 
-// Zadania matematyczne (5 prostych mnożeń)
+// Losowe przemieszanie listy słów do rozpoznawania
+const shuffledRecognitionList = jsPsych.randomization.shuffle(fullRecognitionList);
+
+// Zadania matematyczne (bardziej złożone)
 const mathTasks = [
-    { question: "2 × 3 =", answer: 6 },
-    { question: "4 × 5 =", answer: 20 },
-    { question: "3 × 7 =", answer: 21 },
-    { question: "5 × 6 =", answer: 30 },
-    { question: "8 × 2 =", answer: 16 }
+    { question: "2 + 2 × 3 =", answer: 8 },  // 2 + 6 = 8
+    { question: "4 × 5 - 3 =", answer: 17 }, // 20 - 3 = 17
+    { question: "3 + 4 × 2 =", answer: 11 }, // 3 + 8 = 11
+    { question: "5 × 6 - 4 =", answer: 26 }, // 30 - 4 = 26
+    { question: "8 ÷ 2 + 3 =", answer: 7 }   // 4 + 3 = 7
 ];
 
 // Inicjalizacja jsPsych
@@ -62,8 +66,21 @@ const jsPsych = initJsPsych({
         const data = jsPsych.data.get();
         const dataArray = data.values();
         if (dataArray.length > 0) {
-            const csvData = data.csv();
-            saveDataToOSF(csvData);
+            // Dane z narracji
+            const narrationData = data.filter({ phase: 'narration' }).csv();
+            if (narrationData.split('\n').length > 1) {
+                saveDataToOSF(narrationData, `results_narration_${participantId}.csv`);
+            }
+            // Dane z rozpoznawania
+            const recognitionData = data.filter({ phase: 'recognition' }).csv();
+            if (recognitionData.split('\n').length > 1) {
+                saveDataToOSF(recognitionData, `results_recognition_${participantId}.csv`);
+            }
+            // Dane z pewności
+            const confidenceData = data.filter({ phase: 'confidence' }).csv();
+            if (confidenceData.split('\n').length > 1) {
+                saveDataToOSF(confidenceData, `results_confidence_${participantId}.csv`);
+            }
         } else {
             console.log("Brak danych do zapisania (brak rekordów).");
         }
@@ -85,8 +102,7 @@ function assignToGroup() {
     return groupNames[Math.floor(Math.random() * groupNames.length)];
 }
 
-async function saveDataToOSF(data) {
-    const filename = `results_${new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 15)}.csv`;
+async function saveDataToOSF(data, filename) {
     try {
         const response = await fetch('https://pipe.jspsych.org/api/data', {
             method: 'POST',
@@ -128,6 +144,7 @@ const instructions = {
         <p>(Naciśnij ESC, aby wyjść w dowolnym momencie)</p>
     `,
     choices: ['Przejdź dalej'],
+    data: { phase: 'instructions' },
     on_finish: function(data) {
         console.log("Kliknięto przycisk:", data.response);
         console.log("Pełne dane:", data);
@@ -142,9 +159,25 @@ const demographics = {
         { prompt: "Podaj swój wiek:", name: 'age', required: true, input_type: 'number' },
         { prompt: "Podaj swoją płeć (Kobieta, Mężczyzna, Inna, Wolę nie podawać):", name: 'gender', required: true }
     ],
-    data: { participant_id: participantId, group: group }
+    data: { participant_id: participantId, group: group, phase: 'demographics' }
 };
 timeline.push(demographics);
+
+// Informacja o teście
+const testInfo = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: `
+        <h2>Zaraz zacznie się test</h2>
+        <p>Przygotuj się do zapamiętywania słów z list.</p>
+        <p>Kliknij przycisk, aby kontynuować.</p>
+    `,
+    choices: ['Przejdź dalej'],
+    data: { phase: 'instructions' },
+    on_finish: function(data) {
+        console.log("Kliknięto przycisk w testInfo:", data.response);
+    }
+};
+timeline.push(testInfo);
 
 // Listy słów i narracje
 for (let i = 0; i < listOrder.length; i++) {
@@ -156,11 +189,11 @@ for (let i = 0; i < listOrder.length; i++) {
         const wordTrial = {
             type: jsPsychHtmlKeyboardResponse,
             stimulus: `<h1>${word}</h1>`,
-            choices: ['no_response'], // Brak odpowiedzi, tylko ESC działa
+            choices: ['no_response'],
             trial_duration: 1000,
             response_ends_trial: false,
             post_trial_gap: 500,
-            data: { participant_id: participantId, group: group, list_name: listName, trial_number: i + 1, word: word }
+            data: { participant_id: participantId, group: group, list_name: listName, trial_number: i + 1, word: word, phase: 'word_list' }
         };
         timeline.push(wordTrial);
     }
@@ -178,6 +211,7 @@ for (let i = 0; i < listOrder.length; i++) {
             <p>(Naciśnij ESC, aby wyjść)</p>
         `,
         choices: ['Przejdź dalej'],
+        data: { phase: 'instructions' },
         on_finish: function(data) {
             console.log("Kliknięto przycisk w narracji:", data.response);
         }
@@ -199,7 +233,8 @@ for (let i = 0; i < listOrder.length; i++) {
                 list_name: listName, 
                 trial_number: i + 1, 
                 sentence_number: j + 1, 
-                sentence: sentences[j] 
+                sentence: sentences[j], 
+                phase: 'narration' 
             }
         };
         timeline.push(sentenceTrial);
@@ -216,6 +251,7 @@ for (let i = 0; i < listOrder.length; i++) {
                 <p>(Naciśnij ESC, aby wyjść)</p>
             `,
             choices: ['Przejdź dalej'],
+            data: { phase: 'instructions' },
             on_finish: function(data) {
                 console.log("Kliknięto przycisk w przerwie:", data.response);
             }
@@ -233,6 +269,7 @@ const mathIntro = {
         <p>(Naciśnij ESC, aby wyjść)</p>
     `,
     choices: ['Przejdź dalej'],
+    data: { phase: 'instructions' },
     on_finish: function(data) {
         console.log("Kliknięto przycisk w mathIntro:", data.response);
     }
@@ -249,7 +286,8 @@ for (let i = 0; i < mathTasks.length; i++) {
             participant_id: participantId, 
             group: group, 
             math_question: mathTasks[i].question, 
-            correct_answer: mathTasks[i].answer 
+            correct_answer: mathTasks[i].answer,
+            phase: 'math'
         }
     };
     timeline.push(mathTrial);
@@ -266,14 +304,12 @@ const recognitionIntro = {
         <p>(Naciśnij ESC, aby wyjść)</p>
     `,
     choices: ['Przejdź dalej'],
+    data: { phase: 'instructions' },
     on_finish: function(data) {
         console.log("Kliknięto przycisk w recognitionIntro:", data.response);
     }
 };
 timeline.push(recognitionIntro);
-
-// Losowe przemieszanie listy słów do rozpoznawania
-const shuffledRecognitionList = jsPsych.randomization.shuffle(fullRecognitionList);
 
 for (const word of shuffledRecognitionList) {
     const recognitionTrial = {
@@ -289,7 +325,8 @@ for (const word of shuffledRecognitionList) {
                       wordLists[listOrder[1]].includes(word) || 
                       wordLists[listOrder[2]].includes(word) || 
                       wordLists[listOrder[3]].includes(word) ||
-                      ['lekarz', 'życzenie', 'wysoki', 'gwizdek'].includes(word)
+                      ['lekarz', 'życzenie', 'wysoki', 'gwizdek'].includes(word),
+            phase: 'recognition'
         }
     };
     timeline.push(recognitionTrial);
@@ -304,7 +341,7 @@ for (const word of shuffledRecognitionList) {
                 name: `confidence_${word}` 
             }
         ],
-        data: { participant_id: participantId, group: group, word: word }
+        data: { participant_id: participantId, group: group, word: word, phase: 'confidence' }
     };
     timeline.push(confidenceTrial);
 }
@@ -317,7 +354,8 @@ const endMessage = {
         <p>Twoje dane zostały zapisane.</p>
         <p>Kliknij przycisk, aby zakończyć.</p>
     `,
-    choices: ['Zakończ']
+    choices: ['Zakończ'],
+    data: { phase: 'instructions' }
 };
 timeline.push(endMessage);
 
