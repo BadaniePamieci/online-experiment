@@ -101,9 +101,8 @@ const timeline = [];
 const participantId = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 15);
 const group = assignToGroup();
 
-// Instrukcje początkowe
 const instructions = {
-    type: jsPsychHtmlKeyboardResponse,
+    type: "html-keyboard-response",
     stimulus: `
         <h2>Witamy w badaniu naukowym</h2>
         <p>Wszystkie dane są anonimowe i będą wykorzystywane wyłącznie do celów naukowych.</p>
@@ -113,6 +112,7 @@ const instructions = {
     `,
     choices: ['space', 'escape'],
     on_finish: function(data) {
+        console.log("Naciśnięto klawisz:", data.response); // Dodajemy logowanie
         if (data.response === 'escape') {
             jsPsych.endExperiment('Eksperyment zakończony przez użytkownika.');
         }
