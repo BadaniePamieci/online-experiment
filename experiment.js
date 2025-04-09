@@ -1,5 +1,3 @@
-// experiment.js
-
 // Dane eksperymentu
 const wordLists = {
     "LEKARZ": ["choroba", "pielęgniarka", "stetoskop", "doktor", "kitel", "pomoc", "fartuch", "szpital", "słuchawki", "recepta", "specjalista", "zdrowie", "pediatra", "pacjent", "lek"],
@@ -31,33 +29,31 @@ const narratives = {
     }
 };
 
-// Losowa kolejność list
-const originalListOrder = ["LEKARZ", "ŻYCZENIE", "WYSOKI", "GWIZDEK"];
-const listOrder = jsPsych.randomization.shuffle([...originalListOrder]);
-
+const listOrder = ["LEKARZ", "ŻYCZENIE", "WYSOKI", "GWIZDEK"];
 const groups = {
     "critical": ["critical", "critical", "critical", "critical"],
     "non_critical": ["non_critical", "non_critical", "non_critical", "non_critical"],
     "neutral": ["neutral", "neutral", "neutral", "neutral"]
 };
 
+// Lista 30 słów do fazy rozpoznawania
 const fullRecognitionList = [
-    "stetoskop", "kitel", "fartuch", "słuchawki", "pediatra",
-    "urodziny", "rozkaz", "kartka", "spełnienie", "prośba",
-    "chłopak", "dąb", "poziom", "przystojny", "długi",
-    "sędzia", "hałas", "koniec", "sport", "piłka",
-    "lekarz", "życzenie", "wysoki", "gwizdek",
-    "apteka", "most", "balon", "telewizor", "księżyc",
-    "piasek", "motyl", "laptop", "rower", "zegar"
+    "stetoskop", "kitel", "fartuch", "słuchawki", "pediatra",  // LEKARZ
+    "urodziny", "rozkaz", "kartka", "spełnienie", "prośba",    // ŻYCZENIE
+    "chłopak", "dąb", "poziom", "przystojny", "długi",         // WYSOKI
+    "sędzia", "hałas", "koniec", "sport", "piłka",             // GWIZDEK
+    "lekarz", "życzenie", "wysoki", "gwizdek",                 // Słowa krytyczne
+    "apteka", "most", "balon", "telewizor", "księżyc",         // Dystraktory
+    "piasek", "motyl", "laptop", "rower", "zegar"              // Dystraktory
 ];
 
-// Nowe zadania matematyczne
+// Zadania matematyczne (5 prostych mnożeń)
 const mathTasks = [
-    { question: "2 + 3 × 4 =", answer: 14 },
-    { question: "5 × 2 - 1 =", answer: 9 },
-    { question: "4 + 6 ÷ 2 =", answer: 7 },
-    { question: "10 ÷ 2 × 3 =", answer: 15 },
-    { question: "7 - 3 × 2 =", answer: 1 }
+    { question: "2 × 3 =", answer: 6 },
+    { question: "4 × 5 =", answer: 20 },
+    { question: "3 × 7 =", answer: 21 },
+    { question: "5 × 6 =", answer: 30 },
+    { question: "8 × 2 =", answer: 16 }
 ];
 
 // Inicjalizacja jsPsych
@@ -69,15 +65,17 @@ const jsPsych = initJsPsych({
             const csvData = data.csv();
             saveDataToOSF(csvData);
         } else {
-            console.log("Brak danych do zapisania.");
+            console.log("Brak danych do zapisania (brak rekordów).");
         }
     },
     use_webaudio: false
 });
 
+// Globalny listener dla ESC
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
-        jsPsych.endExperiment('Eksperyment przerwany przez użytkownika.');
+        console.log("Naciśnięto ESC – kończę eksperyment.");
+        jsPsych.endExperiment('Eksperyment zakończony przez użytkownika.');
     }
 });
 
@@ -97,159 +95,231 @@ async function saveDataToOSF(data) {
                 'Accept': '*/*'
             },
             body: JSON.stringify({
-                experimentID: 'nIbjy3keQoaX',
+                experimentID: 'nIbjy3keQoaX', // Wstaw tutaj swój Experiment ID z DataPipe
                 filename: filename,
                 data: data
             })
         });
-        if (!response.ok) throw new Error('Błąd zapisu: ' + response.statusText);
+        if (!response.ok) {
+            throw new Error('Błąd zapisu danych na OSF: ' + response.statusText);
+        }
         return response.json();
     } catch (error) {
-        console.error('Błąd:', error);
-        alert('Problem z zapisem danych.');
+        console.error('Wystąpił błąd podczas zapisywania danych:', error);
+        alert('Wystąpił problem z zapisem danych. Skontaktuj się z badaczem.');
     }
 }
 
 // Timeline eksperymentu
 const timeline = [];
+
+// Dane uczestnika
 const participantId = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 15);
 const group = assignToGroup();
 
-// Ekran startowy
-timeline.push({
+// Instrukcje początkowe
+const instructions = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
-        <h2>Test pamięciowy rozpocznie się za chwilę!</h2>
-        <p>Za chwilę zobaczysz serię słów do zapamiętania.</p>
-        <p>Kliknij przycisk, aby rozpocząć.</p>
+        <h2>Witamy w badaniu naukowym</h2>
+        <p>Wszystkie dane są anonimowe i będą wykorzystywane wyłącznie do celów naukowych.</p>
+        <p>Twoim zadaniem jest zapamiętanie jak najwięcej słów z każdej listy. Po każdej liście przeczytasz krótki tekst. Na koniec odbędzie się test rozpoznawania słów.</p>
+        <p>Kliknij przycisk poniżej, aby kontynuować.</p>
+        <p>(Naciśnij ESC, aby wyjść w dowolnym momencie)</p>
     `,
-    choices: ['Rozpocznij']
-});
+    choices: ['Przejdź dalej'],
+    on_finish: function(data) {
+        console.log("Kliknięto przycisk:", data.response);
+        console.log("Pełne dane:", data);
+    }
+};
+timeline.push(instructions);
 
-// Instrukcje i dane demograficzne
-timeline.push({
-    type: jsPsychHtmlButtonResponse,
-    stimulus: `
-        <h2>Witamy w badaniu</h2>
-        <p>Wszystkie dane są anonimowe. Kliknij poniżej, aby kontynuować.</p>
-    `,
-    choices: ['Przejdź dalej']
-});
-
-timeline.push({
+// Dane demograficzne
+const demographics = {
     type: jsPsychSurveyText,
     questions: [
-        { prompt: "Podaj wiek:", name: 'age', required: true, input_type: 'number' },
-        { prompt: "Podaj płeć:", name: 'gender', required: true }
+        { prompt: "Podaj swój wiek:", name: 'age', required: true, input_type: 'number' },
+        { prompt: "Podaj swoją płeć (Kobieta, Mężczyzna, Inna, Wolę nie podawać):", name: 'gender', required: true }
     ],
     data: { participant_id: participantId, group: group }
-});
+};
+timeline.push(demographics);
 
-// Główna pętla eksperymentu
+// Listy słów i narracje
 for (let i = 0; i < listOrder.length; i++) {
     const listName = listOrder[i];
     const wordList = wordLists[listName];
 
-    // Wyświetlanie słów
+    // Wyświetlenie listy słów
     for (const word of wordList) {
-        timeline.push({
+        const wordTrial = {
             type: jsPsychHtmlKeyboardResponse,
             stimulus: `<h1>${word}</h1>`,
-            choices: ['no_response'],
+            choices: ['no_response'], // Brak odpowiedzi, tylko ESC działa
             trial_duration: 1000,
-            data: { 
-                participant_id: participantId, 
-                group: group, 
-                list_name: listName, 
-                word: word 
-            }
-        });
+            response_ends_trial: false,
+            post_trial_gap: 500,
+            data: { participant_id: participantId, group: group, list_name: listName, trial_number: i + 1, word: word }
+        };
+        timeline.push(wordTrial);
     }
 
-    // Narracje
+    // Narracja
     const narrationType = groups[group][i];
     const narrationText = narratives[listName][narrationType];
     const sentences = narrationText.split('.').map(s => s.trim()).filter(s => s);
 
+    const narrationInstructions = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: `
+            <p>Przeczytaj uważnie poniższe zdania. Twój czas będzie mierzony.</p>
+            <p>Kliknij przycisk poniżej, aby kontynuować.</p>
+            <p>(Naciśnij ESC, aby wyjść)</p>
+        `,
+        choices: ['Przejdź dalej'],
+        on_finish: function(data) {
+            console.log("Kliknięto przycisk w narracji:", data.response);
+        }
+    };
+    timeline.push(narrationInstructions);
+
     for (let j = 0; j < sentences.length; j++) {
-        timeline.push({
+        const sentenceTrial = {
             type: jsPsychHtmlButtonResponse,
             stimulus: `
                 <p>Zdanie ${j + 1}:</p>
                 <p>${sentences[j]}.</p>
-                <p>Kliknij przycisk, aby kontynuować.</p>
+                <p>Kliknij przycisk, aby przejść dalej.</p>
             `,
             choices: ['Przejdź dalej'],
             data: { 
                 participant_id: participantId, 
+                group: group, 
+                list_name: listName, 
+                trial_number: i + 1, 
+                sentence_number: j + 1, 
                 sentence: sentences[j] 
             }
-        });
+        };
+        timeline.push(sentenceTrial);
     }
 
+    // Przerwa między listami (oprócz ostatniej)
     if (i < listOrder.length - 1) {
-        timeline.push({
+        const breakTrial = {
             type: jsPsychHtmlButtonResponse,
-            stimulus: `<p>Krótka przerwa...</p>`,
-            choices: ['Przejdź dalej']
-        });
+            stimulus: `
+                <p>Krótka przerwa...</p>
+                <p>Przygotuj się na następną listę słów.</p>
+                <p>Kliknij przycisk, aby kontynuować.</p>
+                <p>(Naciśnij ESC, aby wyjść)</p>
+            `,
+            choices: ['Przejdź dalej'],
+            on_finish: function(data) {
+                console.log("Kliknięto przycisk w przerwie:", data.response);
+            }
+        };
+        timeline.push(breakTrial);
     }
 }
 
 // Zadania matematyczne
-timeline.push({
+const mathIntro = {
     type: jsPsychHtmlButtonResponse,
-    stimulus: `<p>Teraz rozwiąż zadania matematyczne:</p>`,
-    choices: ['Rozpocznij']
-});
+    stimulus: `
+        <p>Teraz rozwiąż kilka prostych zadań matematycznych.</p>
+        <p>Kliknij przycisk, aby kontynuować.</p>
+        <p>(Naciśnij ESC, aby wyjść)</p>
+    `,
+    choices: ['Przejdź dalej'],
+    on_finish: function(data) {
+        console.log("Kliknięto przycisk w mathIntro:", data.response);
+    }
+};
+timeline.push(mathIntro);
 
-for (const task of mathTasks) {
-    timeline.push({
+for (let i = 0; i < mathTasks.length; i++) {
+    const mathTrial = {
         type: jsPsychSurveyText,
-        questions: [{ 
-            prompt: task.question, 
-            name: 'math_answer', 
-            required: true, 
-            input_type: 'number' 
-        }],
+        questions: [
+            { prompt: `${mathTasks[i].question}`, name: `math_${i}`, required: true, input_type: 'number' }
+        ],
         data: { 
-            correct_answer: task.answer,
-            question: task.question 
+            participant_id: participantId, 
+            group: group, 
+            math_question: mathTasks[i].question, 
+            correct_answer: mathTasks[i].answer 
         }
-    });
+    };
+    timeline.push(mathTrial);
 }
 
 // Faza rozpoznawania
+const recognitionIntro = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: `
+        <p>Teraz zobaczysz listę słów. Twoim zadaniem jest określenie, czy dane słowo pojawiło się wcześniej na którejś z list.</p>
+        <p>Jeśli słowo pojawiło się wcześniej, naciśnij "Tak". Jeśli nie, naciśnij "Nie".</p>
+        <p>Po każdym wyborze ocenisz swoją pewność na skali od 1 (zupełnie niepewny) do 5 (całkowicie pewny).</p>
+        <p>Kliknij przycisk, aby kontynuować.</p>
+        <p>(Naciśnij ESC, aby wyjść)</p>
+    `,
+    choices: ['Przejdź dalej'],
+    on_finish: function(data) {
+        console.log("Kliknięto przycisk w recognitionIntro:", data.response);
+    }
+};
+timeline.push(recognitionIntro);
+
+// Losowe przemieszanie listy słów do rozpoznawania
 const shuffledRecognitionList = jsPsych.randomization.shuffle(fullRecognitionList);
+
 for (const word of shuffledRecognitionList) {
-    timeline.push({
+    const recognitionTrial = {
         type: jsPsychHtmlButtonResponse,
-        stimulus: `<div class="recognition-word"><h1>${word}</h1></div>`,
+        stimulus: `<h1>${word}</h1>`,
         choices: ['Tak', 'Nie'],
         prompt: '<p>Czy to słowo pojawiło się wcześniej?</p>',
         data: { 
-            participant_id: participantId,
+            participant_id: participantId, 
+            group: group, 
             word: word,
-            is_target: fullRecognitionList.slice(0, 24).includes(word)
+            is_target: wordLists[listOrder[0]].includes(word) || 
+                      wordLists[listOrder[1]].includes(word) || 
+                      wordLists[listOrder[2]].includes(word) || 
+                      wordLists[listOrder[3]].includes(word) ||
+                      ['lekarz', 'życzenie', 'wysoki', 'gwizdek'].includes(word)
         }
-    });
+    };
+    timeline.push(recognitionTrial);
 
-    timeline.push({
+    const confidenceTrial = {
         type: jsPsychSurveyLikert,
-        questions: [{
-            prompt: `Pewność odpowiedzi dla "${word}":`,
-            labels: ['1 (niska)', '2', '3', '4', '5 (wysoka)'],
-            required: true
-        }]
-    });
+        questions: [
+            { 
+                prompt: `Jak bardzo jesteś pewien swojej odpowiedzi dla słowa "${word}"?`, 
+                labels: ['1 (zupełnie niepewny)', '2', '3', '4', '5 (całkowicie pewny)'], 
+                required: true, 
+                name: `confidence_${word}` 
+            }
+        ],
+        data: { participant_id: participantId, group: group, word: word }
+    };
+    timeline.push(confidenceTrial);
 }
 
-// Zakończenie
-timeline.push({
+// Zakończenie eksperymentu
+const endMessage = {
     type: jsPsychHtmlButtonResponse,
-    stimulus: `<h2>Dziękujemy!</h2>`,
+    stimulus: `
+        <h2>Dziękujemy za udział w badaniu!</h2>
+        <p>Twoje dane zostały zapisane.</p>
+        <p>Kliknij przycisk, aby zakończyć.</p>
+    `,
     choices: ['Zakończ']
-});
+};
+timeline.push(endMessage);
 
-// Uruchomienie
+// Uruchomienie eksperymentu
 jsPsych.run(timeline);
