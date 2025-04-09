@@ -84,9 +84,7 @@ async function saveDataToOSF(data) {
                 'Accept': '*/*'
             },
             body: JSON.stringify({
-                experimentID: 'nIbjy3keQoaX
-
-', // Wstaw tutaj swój Experiment ID z DataPipe
+                experimentID: 'nIbjy3keQoaX', // Wstaw tutaj swój Experiment ID z DataPipe
                 filename: filename,
                 data: data
             })
