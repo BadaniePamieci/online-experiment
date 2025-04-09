@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Eksperyment Online</title>
-    <!-- Ładowanie PIXI.js -->
-    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.0.0/dist/pixi.min.js" onload="console.log('PIXI.js loaded successfully')" onerror="alert('Błąd: Nie udało się załadować PIXI.js. Sprawdź połączenie z internetem.')"></script>
-    <!-- Ładowanie PsychoJS -->
-    <script src="https://cdn.jsdelivr.net/npm/psychojs@2021.2.3/dist/psychojs.js" onload="console.log('PsychoJS loaded successfully')" onerror="alert('Błąd: Nie udało się załadować PsychoJS. Sprawdź połączenie z internetem.')"></script>
-    <!-- Ładowanie experiment.js z atrybutem defer -->
-    <script defer src="experiment.js"></script>
+    <!-- Ładowanie jsPsych -->
+    <script src="https://unpkg.com/jspsych@7.3.1/dist/jspsych.js"></script>
+    <link href="https://unpkg.com/jspsych@7.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+    <!-- Ładowanie wtyczek jsPsych -->
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.1.2"></script>
+    <!-- Ładowanie skryptu eksperymentu -->
+    <script src="experiment.js"></script>
     <style>
         body {
             margin: 0;
@@ -20,17 +24,23 @@
             background-color: #f0f0f0;
             font-family: Arial, sans-serif;
         }
-        #experiment-container {
-            width: 100%;
-            height: 100%;
+        .jspsych-display-element {
             max-width: 1200px;
             max-height: 800px;
             background-color: white;
             border: 1px solid #ccc;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin: 0;
+        }
+        p {
+            font-size: 1.2em;
+            line-height: 1.5;
         }
     </style>
 </head>
-<body>
-    <div id="experiment-container"></div>
-</body>
+<body></body>
 </html>
