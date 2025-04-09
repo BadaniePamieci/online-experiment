@@ -2,6 +2,7 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eksperyment Online</title>
     <!-- Ładowanie jsPsych -->
     <script src="https://unpkg.com/jspsych@7.3.1/dist/index.browser.min.js"></script>
@@ -11,8 +12,8 @@
     <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.1.2/dist/index.browser.min.js"></script>
     <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.2/dist/index.browser.min.js"></script>
     <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.1.2/dist/index.browser.min.js"></script>
-    <!-- Ładowanie skryptu eksperymentu -->
-    <script src="experiment.js"></script>
+    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@1.0.3"></script>
+    <!-- Style -->
     <style>
         body {
             margin: 0;
@@ -32,10 +33,6 @@
             padding: 20px;
             box-sizing: border-box;
         }
-        .recognition-word {
-        position: relative;
-        top: -100px;
-        }
         h1 {
             font-size: 2.5em;
             margin: 0;
@@ -44,7 +41,17 @@
             font-size: 1.2em;
             line-height: 1.5;
         }
+        .jspsych-content h1 {
+            margin-bottom: 50px; /* Zwiększa odstęp między słowem a przyciskami w fazie rozpoznawania */
+        }
+        .jspsych-btn {
+            margin: 10px; /* Dodaje odstęp między przyciskami */
+        }
     </style>
 </head>
-<body></body>
+<body>
+    <div id="loading-message">Ładowanie eksperymentu...</div>
+    <!-- Ładowanie skryptu eksperymentu na końcu, po załadowaniu jsPsych -->
+    <script src="experiment.js"></script>
+</body>
 </html>
