@@ -256,6 +256,7 @@ const mathInstructions = {
 };
 timeline.push(mathInstructions);
 
+// Prostsza wersja zadań matematycznych (bez komunikatów i powtórek)
 const mathTasks = [
     { question: '2 + 3 × 4 =', answer: '14' },
     { question: '5 × 2 + 1 =', answer: '11' },
@@ -267,62 +268,29 @@ const mathTasks = [
 const mathTrials = [];
 for (let i = 0; i < mathTasks.length; i++) {
     const mathTrial = {
-        timeline: [
-            {
-                type: jsPsychSurveyText,
-                questions: [
-                    { 
-                        prompt: `${mathTasks[i].question}`, 
-                        name: `math_${i}`, 
-                        required: true, 
-                        input_type: 'number',
-                        validate: function(value) {
-                            if (isNaN(value) || value === '') {
-                                return 'Proszę wpisać liczbę.';
-                            }
-                            return true;
-                        }
+        type: jsPsychSurveyText,
+        questions: [
+            { 
+                prompt: `${mathTasks[i].question}`, 
+                name: `math_${i}`, 
+                required: true, 
+                input_type: 'number',
+                validate: function(value) {
+                    if (isNaN(value) || value === '') {
+                        return 'Proszę wpisać liczbę.';
                     }
-                ],
-                data: { 
-                    participant_id: participantId, 
-                    group: group, 
-                    math_question: mathTasks[i].question, 
-                    correct_answer: mathTasks[i].answer,
-                    phase: 'math'
-                },
-                button_label: 'Sprawdź odpowiedź' // Wymaga kliknięcia przycisku
-            },
-            {
-                type: jsPsychHtmlKeyboardResponse,
-                stimulus: function() {
-                    const lastTrialData = jsPsych.data.getLastTrialData().values()[0];
-                    const response = lastTrialData.responses[`math_${i}`];
-                    const correctAnswer = mathTasks[i].answer;
-                    if (response === correctAnswer) {
-                        return '<p>Poprawna odpowiedź!</p>';
-                    } else {
-                        return '<p>Spróbuj ponownie.</p>';
-                    }
-                },
-                choices: ['no_response'],
-                trial_duration: 2000,
-                response_ends_trial: false
+                    return true;
+                }
             }
         ],
-        conditional_function: function() {
-            const lastTrialData = jsPsych.data.getLastTrialData().values()[0];
-            if (!lastTrialData.responses) return true; // Pierwsze uruchomienie triala
-            const response = lastTrialData.responses[`math_${i}`];
-            const correctAnswer = mathTasks[i].answer;
-            return response !== correctAnswer; // Powtórz, jeśli odpowiedź jest błędna
+        data: { 
+            participant_id: participantId, 
+            group: group, 
+            math_question: mathTasks[i].question, 
+            correct_answer: mathTasks[i].answer,
+            phase: 'math'
         },
-        loop_function: function(data) {
-            const lastTrialData = data.values()[0];
-            const response = lastTrialData.responses[`math_${i}`];
-            const correctAnswer = mathTasks[i].answer;
-            return response !== correctAnswer; // Powtarzaj, dopóki odpowiedź nie jest poprawna
-        }
+        button_label: 'Przejdź dalej' // Wymaga kliknięcia przycisku
     };
     mathTrials.push(mathTrial);
 }
