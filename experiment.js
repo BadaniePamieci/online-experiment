@@ -301,9 +301,6 @@ const recognitionIntro = {
 };
 timeline.push(recognitionIntro);
 
-// Zmienna do przechowywania danych rozpoznawania
-let currentRecognitionData = {};
-
 for (const word of shuffledRecognitionList) {
     const recognitionTrial = {
         type: jsPsychHtmlButtonResponse,
@@ -322,12 +319,8 @@ for (const word of shuffledRecognitionList) {
             phase: 'recognition'
         },
         on_finish: function(data) {
-            // Zapisujemy dane z fazy rozpoznawania
-            const responseText = data.response === 0 ? 'Tak' : 'Nie';
-            currentRecognitionData = {
-                stimulus: word,
-                response: responseText
-            };
+            // Zapisujemy odpowiedź jako "Tak" lub "Nie"
+            data.response_text = data.response === 0 ? 'Tak' : 'Nie';
         }
     };
     timeline.push(recognitionTrial);
@@ -349,14 +342,14 @@ for (const word of shuffledRecognitionList) {
             phase: 'confidence'
         },
         on_finish: function(data) {
-            // Pobieramy wartość pewności
+            // Pobieramy dane z poprzedniego trialu (recognition)
+            const recognitionData = jsPsych.data.get().last(1).values()[0];
+            const responseText = recognitionData.response_text;
             const confidenceValue = data.response[`confidence_${word}`] + 1; // +1, bo skala w danych zaczyna się od 0
             // Tworzymy ciąg RecognitionData
-            const recognitionDataString = `${currentRecognitionData.stimulus}, ${currentRecognitionData.response}, ${confidenceValue}`;
-            // Aktualizujemy dane w poprzednim trialu (recognition)
-            jsPsych.data.get().last(2).select('RecognitionData').addTo(recognitionDataString);
-            // Czyścimy currentRecognitionData
-            currentRecognitionData = {};
+            const recognitionDataString = `${word}, ${responseText}, ${confidenceValue}`;
+            // Dodajemy RecognitionData do danych poprzedniego trialu
+            jsPsych.data.get().last(1).addProperties({ RecognitionData: recognitionDataString });
         }
     };
     timeline.push(confidenceTrial);
