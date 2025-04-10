@@ -1,3 +1,4 @@
+
 // Inicjalizacja jsPsych
 const jsPsych = initJsPsych({
     on_finish: function() {
@@ -5,6 +6,7 @@ const jsPsych = initJsPsych({
         const dataArray = data.values();
         if (dataArray.length > 0) {
             const csvData = data.csv();
+            // Dodajemy nazwę grupy do nazwy pliku
             saveDataToOSF(csvData, `results_${group}_${participantId}.csv`);
         } else {
             console.log("Brak danych do zapisania (brak rekordów).");
@@ -317,10 +319,6 @@ for (const word of shuffledRecognitionList) {
                       wordLists[listOrder[3]].includes(word) ||
                       ['lekarz', 'życzenie', 'wysoki', 'gwizdek'].includes(word),
             phase: 'recognition'
-        },
-        on_finish: function(data) {
-            // Zapisujemy odpowiedź jako "Tak" lub "Nie"
-            data.response_text = data.response === 0 ? 'Tak' : 'Nie';
         }
     };
     timeline.push(recognitionTrial);
@@ -335,22 +333,7 @@ for (const word of shuffledRecognitionList) {
                 name: `confidence_${word}` 
             }
         ],
-        data: { 
-            participant_id: participantId, 
-            group: group, 
-            word: word, 
-            phase: 'confidence'
-        },
-        on_finish: function(data) {
-            // Pobieramy dane z poprzedniego trialu (recognition)
-            const recognitionData = jsPsych.data.get().last(1).values()[0];
-            const responseText = recognitionData.response_text;
-            const confidenceValue = data.response[`confidence_${word}`] + 1; // +1, bo skala w danych zaczyna się od 0
-            // Tworzymy ciąg RecognitionData
-            const recognitionDataString = `${word}, ${responseText}, ${confidenceValue}`;
-            // Dodajemy RecognitionData do danych poprzedniego trialu
-            jsPsych.data.get().last(1).addProperties({ RecognitionData: recognitionDataString });
-        }
+        data: { participant_id: participantId, group: group, word: word, phase: 'confidence' }
     };
     timeline.push(confidenceTrial);
 }
