@@ -4,40 +4,9 @@ const jsPsych = initJsPsych({
         const data = jsPsych.data.get();
         const dataArray = data.values();
         if (dataArray.length > 0) {
-            // Przygotowanie głównej tabeli danych
-            let csvData = data.csv();
-
-            // Przygotowanie tabeli RecognitionRatings
-            const recognitionData = data.filter({ phase: 'recognition' });
-            const confidenceData = data.filter({ phase: 'confidence' });
-            let recognitionRatings = "RecognitionRatings\nword,response,confidence\n";
-
-            recognitionData.values().forEach((recTrial, index) => {
-                const word = recTrial.word;
-                const response = recTrial.response === "0" ? "Tak" : "Nie";
-                const confTrial = confidenceData.values()[index];
-                const confidence = confTrial.response.match(/\d/)[0]; // Wyciąga cyfrę z {"confidence_<słowo>":X}
-                recognitionRatings += `${word},${response},${confidence}\n`;
-            });
-
-            // Połączenie głównej tabeli i RecognitionRatings
-            csvData += "\n\n" + recognitionRatings;
-
-            // Zapis danych z nazwą pliku zawierającą grupę
-            saveDataToOSF(csvData, `results_${group}_${participantId}.csv`).catch((error) => {
-                console.error("Błąd zapisu na OSF:", error);
-                // Fallback: zapis lokalny
-                const blob = new Blob([csvData], { type: 'text/csv' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `results_${group}_${participantId}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-                alert("Zapis na OSF nie powiódł się. Dane zostały zapisane lokalnie.");
-            });
+            const csvData = data.csv();
+            // Dodajemy nazwę grupy do nazwy pliku
+            saveDataToOSF(csvData, `results_${group}_${participantId}.csv`);
         } else {
             console.log("Brak danych do zapisania (brak rekordów).");
         }
@@ -47,6 +16,15 @@ const jsPsych = initJsPsych({
 
 // Dane uczestnika
 const participantId = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 15);
+
+// Mechanizm sekwencyjnego przypisania grup
+let groupCounter = localStorage.getItem('groupCounter') ? parseInt(localStorage.getItem('groupCounter')) : 0;
+const groupNames = ["critical", "non_critical", "neutral"];
+const group = groupNames[groupCounter % groupNames.length];
+
+// Zwiększ licznik po przypisaniu grupy
+groupCounter = (groupCounter + 1) % groupNames.length;
+localStorage.setItem('groupCounter', groupCounter);
 
 // Funkcja zapisu danych
 async function saveDataToOSF(data, filename) {
@@ -58,7 +36,7 @@ async function saveDataToOSF(data, filename) {
                 'Accept': '*/*'
             },
             body: JSON.stringify({
-                experimentID: 'nIbjy3keQoaX', // Sprawdź, czy to poprawny Experiment ID
+                experimentID: 'nIbjy3keQoaX', // Twój Experiment ID z DataPipe
                 filename: filename,
                 data: data
             })
@@ -68,7 +46,8 @@ async function saveDataToOSF(data, filename) {
         }
         return response.json();
     } catch (error) {
-        throw error; // Przekazujemy błąd do catch w on_finish
+        console.error('Wystąpił błąd podczas zapisywania danych:', error);
+        alert('Wystąpił problem z zapisem danych. Skontaktuj się z badaczem.');
     }
 }
 
@@ -141,14 +120,6 @@ const mathTasks = [
     { question: "5 × 6 - 4 =", answer: 26 }, // 30 - 4 = 26
     { question: "8 ÷ 2 + 3 =", answer: 7 }   // 4 + 3 = 7
 ];
-
-// Funkcja przypisania do grupy
-function assignToGroup() {
-    const groupNames = Object.keys(groups);
-    return groupNames[Math.floor(Math.random() * groupNames.length)];
-}
-
-const group = assignToGroup();
 
 // Timeline eksperymentu
 const timeline = [];
