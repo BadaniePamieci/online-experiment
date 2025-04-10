@@ -12,7 +12,7 @@ const jsPsych = initJsPsych({
             const confidenceData = data.filter({ phase: 'confidence' });
             let recognitionRatings = "RecognitionRatings\nword,response,confidence\n";
 
-            recognitionData.forEach((recTrial, index) => {
+            recognitionData.values().forEach((recTrial, index) => {
                 const word = recTrial.word;
                 const response = recTrial.response === "0" ? "Tak" : "Nie";
                 const confTrial = confidenceData.values()[index];
@@ -24,7 +24,20 @@ const jsPsych = initJsPsych({
             csvData += "\n\n" + recognitionRatings;
 
             // Zapis danych z nazwą pliku zawierającą grupę
-            saveDataToOSF(csvData, `results_${group}_${participantId}.csv`);
+            saveDataToOSF(csvData, `results_${group}_${participantId}.csv`).catch((error) => {
+                console.error("Błąd zapisu na OSF:", error);
+                // Fallback: zapis lokalny
+                const blob = new Blob([csvData], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `results_${group}_${participantId}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                alert("Zapis na OSF nie powiódł się. Dane zostały zapisane lokalnie.");
+            });
         } else {
             console.log("Brak danych do zapisania (brak rekordów).");
         }
@@ -45,7 +58,7 @@ async function saveDataToOSF(data, filename) {
                 'Accept': '*/*'
             },
             body: JSON.stringify({
-                experimentID: 'nIbjy3keQoaX', // Twój Experiment ID z DataPipe
+                experimentID: 'nIbjy3keQoaX', // Sprawdź, czy to poprawny Experiment ID
                 filename: filename,
                 data: data
             })
@@ -55,8 +68,7 @@ async function saveDataToOSF(data, filename) {
         }
         return response.json();
     } catch (error) {
-        console.error('Wystąpił błąd podczas zapisywania danych:', error);
-        alert('Wystąpił problem z zapisem danych. Skontaktuj się z badaczem.');
+        throw error; // Przekazujemy błąd do catch w on_finish
     }
 }
 
