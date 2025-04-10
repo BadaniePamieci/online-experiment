@@ -5,7 +5,6 @@ const jsPsych = initJsPsych({
         const dataArray = data.values();
         if (dataArray.length > 0) {
             const csvData = data.csv();
-            // Dodajemy nazwę grupy do nazwy pliku
             saveDataToOSF(csvData, `results_${group}_${participantId}.csv`);
         } else {
             console.log("Brak danych do zapisania (brak rekordów).");
@@ -302,6 +301,9 @@ const recognitionIntro = {
 };
 timeline.push(recognitionIntro);
 
+// Zmienna do przechowywania danych rozpoznawania
+let currentRecognitionData = {};
+
 for (const word of shuffledRecognitionList) {
     const recognitionTrial = {
         type: jsPsychHtmlButtonResponse,
@@ -318,6 +320,14 @@ for (const word of shuffledRecognitionList) {
                       wordLists[listOrder[3]].includes(word) ||
                       ['lekarz', 'życzenie', 'wysoki', 'gwizdek'].includes(word),
             phase: 'recognition'
+        },
+        on_finish: function(data) {
+            // Zapisujemy dane z fazy rozpoznawania
+            const responseText = data.response === 0 ? 'Tak' : 'Nie';
+            currentRecognitionData = {
+                stimulus: word,
+                response: responseText
+            };
         }
     };
     timeline.push(recognitionTrial);
@@ -332,7 +342,22 @@ for (const word of shuffledRecognitionList) {
                 name: `confidence_${word}` 
             }
         ],
-        data: { participant_id: participantId, group: group, word: word, phase: 'confidence' }
+        data: { 
+            participant_id: participantId, 
+            group: group, 
+            word: word, 
+            phase: 'confidence'
+        },
+        on_finish: function(data) {
+            // Pobieramy wartość pewności
+            const confidenceValue = data.response[`confidence_${word}`] + 1; // +1, bo skala w danych zaczyna się od 0
+            // Tworzymy ciąg RecognitionData
+            const recognitionDataString = `${currentRecognitionData.stimulus}, ${currentRecognitionData.response}, ${confidenceValue}`;
+            // Aktualizujemy dane w poprzednim trialu (recognition)
+            jsPsych.data.get().last(2).select('RecognitionData').addTo(recognitionDataString);
+            // Czyścimy currentRecognitionData
+            currentRecognitionData = {};
+        }
     };
     timeline.push(confidenceTrial);
 }
