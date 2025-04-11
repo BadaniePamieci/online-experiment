@@ -1,4 +1,3 @@
-
 // Inicjalizacja jsPsych
 const jsPsych = initJsPsych({
     on_finish: function() {
@@ -60,7 +59,6 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
-
 // Dane eksperymentu
 const wordLists = {
     "LEKARZ": ["choroba", "pielęgniarka", "stetoskop", "doktor", "kitel", "pomoc", "fartuch", "szpital", "słuchawki", "recepta", "specjalista", "zdrowie", "pediatra", "pacjent", "lek"],
@@ -89,7 +87,7 @@ const narratives = {
     "GWIZDEK": {
         "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że jesteś na sali gimnastycznej podczas w-f. Młody trener krzyczy, byście ustawili się w rzędzie. Słyszysz wyraźny hałas z zewnątrz i przestajesz skupiać się na lekcji. Za oknem dostrzegasz policjanta, który kieruje ruchem po wypadku samochodowym, wydając wysokie dźwięki. Zapatrzony w okno nagle słyszysz niechciany, głośny sygnał i wiesz, że musisz zacząć biegać okrążenia na hali.",
         "non_critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że jesteś na sali gimnastycznej podczas w-f. Młody trener krzyczy, byście ustawili się w rzędzie. Ty jednak nie skupiasz się na lekcji, bo za oknem dostrzegasz policjanta, który kieruje ruchem po wypadku samochodowym. Zapatrzony w okno słyszysz dźwięk głosu trenera, który mówi, że musisz się skupić. To twój sygnał, żeby zacząć biegać okrążenia na hali.",
-        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że przeglądasz stare zdjęcia w albumie na poddaszu babci. Kurz unosi się w promieniach słońca wpadających przez okno, a na półkach stoją pudełka z porcelanowymi figurkami. Na jednym ze zdjęć widzisz siebie jako młode dziecko, trzymające pluszowego misia w kapeluszu. Pachnie tu lawendą i starą drewnianą podłogą. Zastanawiasz się, czy zabrać któreś zdjęcie do ramki."
+        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że przeglądasz stare zdjęcia w albumie na poddaszu babci. Kurz unosi się w promieniach słońca wpadających przez okno, a na półkach stoją pudełka z porcelanowymi figurkami. Na jednym ze zdjęć widzisz siebie jako młode dziecko, trzymające pluszowego misia w kapeluszu. Pachnie tu lawendą i starą drewnianą podłogą. Zastanawiasz się, czy zabrać któreś zdjęcie do ramki."
     }
 };
 
@@ -102,32 +100,15 @@ const groups = {
 };
 
 // Zaktualizowana lista słów do fazy rozpoznawania
-const wordLists = [
-    "stetoskop", "kitel", "słuchawki", "pediatra",          // LEKARZ (3,5,9,13)
-    "chłopak", "dąb", "przystojny", "długi",                // WYSOKI (3,5,9,13)
-    "sprite", "oaza", "pepsi", "woda",                      // SPRAGNIONY (3,5,9,13)
-    "sędzia", "hałas", "sport", "piłka",                    // GWIZDEK (3,5,9,13)
-    "lekarz", "wysoki", "spragniony", "gwizdek",            // Słowa krytyczne
-    "drzwi", "koszulka", "kelner", "młody",                 // Słowa z narracji
-    "farby", "miska", "pies", "telefon", "makaron", "korona", "dżungla", "medal" // Dystraktory
-];
-// Losowa kolejność list
-const listOrder = jsPsych.randomization.shuffle(["LEKARZ", "ŻYCZENIE", "WYSOKI", "GWIZDEK"]);
-const groups = {
-    "critical": ["critical", "critical", "critical", "critical"],
-    "non_critical": ["non_critical", "non_critical", "non_critical", "non_critical"],
-    "neutral": ["neutral", "neutral", "neutral", "neutral"]
-};
-
-// Lista 30 słów do fazy rozpoznawania
 const fullRecognitionList = [
     "stetoskop", "kitel", "słuchawki", "pediatra",          // LEKARZ (3,5,9,13)
     "chłopak", "dąb", "przystojny", "długi",                // WYSOKI (3,5,9,13)
     "sprite", "oaza", "pepsi", "woda",                      // SPRAGNIONY (3,5,9,13)
     "sędzia", "hałas", "sport", "piłka",                    // GWIZDEK (3,5,9,13)
     "lekarz", "wysoki", "spragniony", "gwizdek",            // Słowa krytyczne
-    "drzwi", "koszulka", "kelner", "młody",                 // Słowa z narracji
+    "drzwi", "koszulka", "kelner", "młody",                 // Elementy wspólne z narracji
     "farby", "miska", "pies", "telefon", "makaron", "korona", "dżungla", "medal" // Dystraktory
+];
 
 // Losowe przemieszanie listy słów do rozpoznawania
 const shuffledRecognitionList = jsPsych.randomization.shuffle(fullRecognitionList);
@@ -336,7 +317,7 @@ for (const word of shuffledRecognitionList) {
                       wordLists[listOrder[1]].includes(word) || 
                       wordLists[listOrder[2]].includes(word) || 
                       wordLists[listOrder[3]].includes(word) ||
-                      ['lekarz', 'życzenie', 'wysoki', 'gwizdek'].includes(word),
+                      ['lekarz', 'wysoki', 'spragniony', 'gwizdek'].includes(word),
             phase: 'recognition'
         }
     };
