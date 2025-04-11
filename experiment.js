@@ -121,14 +121,13 @@ const groups = {
 
 // Lista 30 słów do fazy rozpoznawania
 const fullRecognitionList = [
-    "stetoskop", "kitel", "fartuch", "słuchawki", "pediatra",  // LEKARZ
-    "urodziny", "rozkaz", "kartka", "spełnienie", "prośba",    // ŻYCZENIE
-    "chłopak", "dąb", "poziom", "przystojny", "długi",         // WYSOKI
-    "sędzia", "hałas", "koniec", "sport", "piłka",             // GWIZDEK
-    "lekarz", "życzenie", "wysoki", "gwizdek",                 // Słowa krytyczne
-    "apteka", "most", "balon", "telewizor", "księżyc",         // Dystraktory
-    "piasek", "motyl", "laptop", "rower", "zegar"              // Dystraktory
-];
+    "stetoskop", "kitel", "słuchawki", "pediatra",          // LEKARZ (3,5,9,13)
+    "chłopak", "dąb", "przystojny", "długi",                // WYSOKI (3,5,9,13)
+    "sprite", "oaza", "pepsi", "woda",                      // SPRAGNIONY (3,5,9,13)
+    "sędzia", "hałas", "sport", "piłka",                    // GWIZDEK (3,5,9,13)
+    "lekarz", "wysoki", "spragniony", "gwizdek",            // Słowa krytyczne
+    "drzwi", "koszulka", "kelner", "młody",                 // Słowa z narracji
+    "farby", "miska", "pies", "telefon", "makaron", "korona", "dżungla", "medal" // Dystraktory
 
 // Losowe przemieszanie listy słów do rozpoznawania
 const shuffledRecognitionList = jsPsych.randomization.shuffle(fullRecognitionList);
