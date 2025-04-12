@@ -5,7 +5,6 @@ const jsPsych = initJsPsych({
         const dataArray = data.values();
         if (dataArray.length > 0) {
             const csvData = data.csv();
-            // Dodajemy nazwę grupy do nazwy pliku
             saveDataToOSF(csvData, `results_${group}_${participantId}.csv`);
         } else {
             console.log("Brak danych do zapisania (brak rekordów).");
@@ -36,7 +35,7 @@ async function saveDataToOSF(data, filename) {
                 'Accept': '*/*'
             },
             body: JSON.stringify({
-                experimentID: 'nIbjy3keQoaX', // Twój Experiment ID z DataPipe
+                experimentID: 'nIbjy3keQoaX',
                 filename: filename,
                 data: data
             })
@@ -67,7 +66,7 @@ const wordLists = {
     "GWIZDEK": ["mecz", "w-f", "sędzia", "głośny", "hałas", "trener", "koniec", "dźwięk", "sport", "policjant", "gwizd", "czajnik", "świst", "sygnał", "piłka"]
 };
 
-// Zaktualizowane narracje
+// Narracje
 const narratives = {
     "LEKARZ": {
         "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w zatłoczonej poczekalni szpitala. Przez uchylone drzwi gabinetu widzisz pielęgniarkę, która pobiera krew nastolatkowi. W pomieszczeniu obok mężczyzna ubrany na biało słucha staruszki opisującej kaszel. Przez korytarz przechodzi pacjent z receptą w dłoni, którą wypisał mu ktoś przed chwilą. Czekasz, aż ktoś udzieli ci pomocy, a chłodne powietrze i stukot klawiatur sprawiają, że chcesz jak najszybciej iść do domu.",
@@ -99,7 +98,7 @@ const groups = {
     "neutral": ["neutral", "neutral", "neutral", "neutral"]
 };
 
-// Zaktualizowana lista słów do fazy rozpoznawania
+// Lista słów do fazy rozpoznawania
 const fullRecognitionList = [
     "stetoskop", "kitel", "słuchawki", "pediatra",          // LEKARZ (3,5,9,13)
     "chłopak", "dąb", "przystojny", "długi",                // WYSOKI (3,5,9,13)
@@ -113,25 +112,43 @@ const fullRecognitionList = [
 // Losowe przemieszanie listy słów do rozpoznawania
 const shuffledRecognitionList = jsPsych.randomization.shuffle(fullRecognitionList);
 
-// Zadania matematyczne (bardziej złożone)
+// Zadania matematyczne
 const mathTasks = [
-    { question: "2 + 2 × 3 =", answer: 8 },  // 2 + 6 = 8
-    { question: "4 × 5 - 3 =", answer: 17 }, // 20 - 3 = 17
-    { question: "3 + 4 × 2 =", answer: 11 }, // 3 + 8 = 11
-    { question: "5 × 6 - 4 =", answer: 26 }, // 30 - 4 = 26
-    { question: "8 ÷ 2 + 3 =", answer: 7 }   // 4 + 3 = 7
+    { question: "2 + 2 × 3 =", answer: 8 },
+    { question: "4 × 5 - 3 =", answer: 17 },
+    { question: "3 + 4 × 2 =", answer: 11 },
+    { question: "5 × 6 - 4 =", answer: 26 },
+    { question: "8 ÷ 2 + 3 =", answer: 7 }
 ];
 
 // Timeline eksperymentu
 const timeline = [];
 
+// Nowy ekran początkowy
+const welcomeScreen = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: `
+        <h2>Badanie pamięci online</h2>
+        <p>To badanie wymaga użycia ekranu komputera lub laptopa.</p>
+        <p>Jeśli nie możesz teraz użyć takiego urządzenia, naciśnij ESC, aby wyjść z badania i wróć później.</p>
+        <p>Jeśli jesteś gotowy/a, kliknij przycisk poniżej, aby kontynuować.</p>
+    `,
+    choices: ['Przejdź dalej'],
+    data: { phase: 'welcome' },
+    on_finish: function(data) {
+        console.log("Kliknięto przycisk na ekranie powitalnym:", data.response);
+    }
+};
+timeline.push(welcomeScreen);
+
 // Instrukcje początkowe
 const instructions = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
-        <h2>Witamy w badaniu naukowym</h2>
+        <h2>Witamy w badaniu pamięci</h2>
+        <p>W tym badaniu wyświetlone zostaną listy słów. Każde słowo będzie pokazywane pojedynczo przez krótki czas, z przerwą między słowami.</p>
+        <p>Twoim zadaniem jest zapamiętanie jak największej liczby słów z każdej listy. Po każdej liście przeczytasz krótki tekst. Na koniec weźmiesz udział w teście rozpoznawania słów.</p>
         <p>Wszystkie dane są anonimowe i będą wykorzystywane wyłącznie do celów naukowych.</p>
-        <p>Twoim zadaniem jest zapamiętanie jak najwięcej słów z każdej listy. Po każdej liście przeczytasz krótki tekst. Na koniec odbędzie się test rozpoznawania słów.</p>
         <p>Kliknij przycisk poniżej, aby kontynuować.</p>
         <p>(Naciśnij ESC, aby wyjść w dowolnym momencie)</p>
     `,
@@ -198,8 +215,7 @@ for (let i = 0; i < listOrder.length; i++) {
     const narrationInstructions = {
         type: jsPsychHtmlButtonResponse,
         stimulus: `
-            <p>Przeczytaj uważnie poniższe zdania. Twój czas będzie mierzony.</p>
-            <p>Kliknij przycisk poniżej, aby kontynuować.</p>
+            <p>Przeczytaj poniższe zdania i kliknij „Dalej”, gdy tylko będziesz gotowy/a.</p>
             <p>(Naciśnij ESC, aby wyjść)</p>
         `,
         choices: ['Przejdź dalej'],
@@ -289,9 +305,9 @@ for (let i = 0; i < mathTasks.length; i++) {
 const recognitionIntro = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
-        <p>Teraz zobaczysz listę słów. Twoim zadaniem jest określenie, czy dane słowo pojawiło się wcześniej na którejś z list.</p>
-        <p>Jeśli słowo pojawiło się wcześniej, naciśnij "Tak". Jeśli nie, naciśnij "Nie".</p>
-        <p>Po każdym wyborze ocenisz swoją pewność na skali od 1 (zupełnie niepewny) do 5 (całkowicie pewny).</p>
+        <p>Teraz zobaczysz pojedyncze słowa. Twoim zadaniem jest określenie, czy dane słowo pojawiło się wcześniej na którejś z list słów (nie w tekstach).</p>
+        <p>Jeśli słowo było na liście, naciśnij „Tak”. Jeśli nie, naciśnij „Nie”.</p>
+        <p>Po każdym wyborze ocenisz swoją pewność na skali od 1 (zupełnie niepewny/a) do 5 (całkowicie pewny/a).</p>
         <p>Kliknij przycisk, aby kontynuować.</p>
         <p>(Naciśnij ESC, aby wyjść)</p>
     `,
@@ -343,8 +359,8 @@ const endMessage = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
         <h2>Dziękujemy za udział w badaniu!</h2>
-        <p>Twoje dane zostały zapisane.</p>
-        <p>Kliknij przycisk, aby zakończyć.</p>
+        <p>Twój udział w teście rozpoznawania słów z list został zakończony. Twoje dane zostały zapisane.</p>
+        <p>Kliknij przycisk, aby zakończyć badanie.</p>
     `,
     choices: ['Zakończ'],
     data: { phase: 'instructions' }
