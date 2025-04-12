@@ -129,8 +129,10 @@ const welcomeScreen = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
         <h2>Badanie pamięci online</h2>
-        <p>To badanie wymaga użycia ekranu komputera lub laptopa.</p>
-        <p>Jeśli nie możesz teraz użyć takiego urządzenia, naciśnij ESC, aby wyjść z badania i wróć później.</p>
+        <p>To badanie zajmie około 20 minut. Prosimy wykonać je w skupieniu, w cichym pomieszczeniu, aby uniknąć rozproszenia.</p>
+        <p>Prosimy przechodzić przez zadania i teksty płynnie, bez zatrzymywania się. Twój czas będzie mierzony.</p>
+        <p>Jeśli naciśniesz ESC, Twoje dane nie będą brane pod uwagę. Dane nie będą również uwzględniane, jeśli wykryjemy, że nie czytasz tekstów.</p>
+        <p>Badanie wymaga użycia ekranu komputera lub laptopa. Jeśli nie możesz teraz użyć takiego urządzenia, naciśnij ESC i wróć później.</p>
         <p>Jeśli jesteś gotowy/a, kliknij przycisk poniżej, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
