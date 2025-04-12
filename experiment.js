@@ -124,7 +124,7 @@ const mathTasks = [
 // Timeline eksperymentu
 const timeline = [];
 
-// Nowy ekran początkowy
+// Ekran początkowy
 const welcomeScreen = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
@@ -136,10 +136,7 @@ const welcomeScreen = {
         <p>Jeśli jesteś gotowy/a, kliknij przycisk poniżej, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
-    data: { phase: 'welcome' },
-    on_finish: function(data) {
-        console.log("Kliknięto przycisk na ekranie powitalnym:", data.response);
-    }
+    data: { phase: 'welcome', participant_id: participantId, group: group }
 };
 timeline.push(welcomeScreen);
 
@@ -155,11 +152,7 @@ const instructions = {
         <p>(Naciśnij ESC, aby wyjść w dowolnym momencie)</p>
     `,
     choices: ['Przejdź dalej'],
-    data: { phase: 'instructions' },
-    on_finish: function(data) {
-        console.log("Kliknięto przycisk:", data.response);
-        console.log("Pełne dane:", data);
-    }
+    data: { phase: 'instructions', participant_id: participantId, group: group }
 };
 timeline.push(instructions);
 
@@ -170,7 +163,7 @@ const demographics = {
         { prompt: "Podaj swój wiek:", name: 'age', required: true, input_type: 'number' },
         { prompt: "Podaj swoją płeć (Kobieta, Mężczyzna, Inna, Wolę nie podawać):", name: 'gender', required: true }
     ],
-    data: { participant_id: participantId, group: group, phase: 'demographics' }
+    data: { phase: 'demographics', participant_id: participantId, group: group }
 };
 timeline.push(demographics);
 
@@ -183,10 +176,7 @@ const testInfo = {
         <p>Kliknij przycisk, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
-    data: { phase: 'instructions' },
-    on_finish: function(data) {
-        console.log("Kliknięto przycisk w testInfo:", data.response);
-    }
+    data: { phase: 'instructions', participant_id: participantId, group: group }
 };
 timeline.push(testInfo);
 
@@ -204,7 +194,14 @@ for (let i = 0; i < listOrder.length; i++) {
             trial_duration: 1000,
             response_ends_trial: false,
             post_trial_gap: 500,
-            data: { participant_id: participantId, group: group, list_name: listName, trial_number: i + 1, word: word, phase: 'word_list' }
+            data: { 
+                participant_id: participantId, 
+                group: group, 
+                list_name: listName, 
+                trial_number: i + 1, 
+                word: word, 
+                phase: 'word_list' 
+            }
         };
         timeline.push(wordTrial);
     }
@@ -221,10 +218,7 @@ for (let i = 0; i < listOrder.length; i++) {
             <p>(Naciśnij ESC, aby wyjść)</p>
         `,
         choices: ['Przejdź dalej'],
-        data: { phase: 'instructions' },
-        on_finish: function(data) {
-            console.log("Kliknięto przycisk w narracji:", data.response);
-        }
+        data: { phase: 'instructions', participant_id: participantId, group: group }
     };
     timeline.push(narrationInstructions);
 
@@ -267,10 +261,7 @@ for (let i = 0; i < listOrder.length; i++) {
                 <p>(Naciśnij ESC, aby wyjść)</p>
             `,
             choices: ['Przejdź dalej'],
-            data: { phase: 'instructions' },
-            on_finish: function(data) {
-                console.log("Kliknięto przycisk w przerwie:", data.response);
-            }
+            data: { phase: 'instructions', participant_id: participantId, group: group }
         };
         timeline.push(breakTrial);
     }
@@ -281,14 +272,12 @@ const mathIntro = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
         <p>Teraz rozwiąż kilka prostych zadań matematycznych.</p>
+        <p>Wpisz odpowiedź liczbową w polu tekstowym. Upewnij się, że uwzględniasz kolejność działań (mnożenie i dzielenie przed dodawaniem i odejmowaniem).</p>
         <p>Kliknij przycisk, aby kontynuować.</p>
         <p>(Naciśnij ESC, aby wyjść)</p>
     `,
     choices: ['Przejdź dalej'],
-    data: { phase: 'instructions' },
-    on_finish: function(data) {
-        console.log("Kliknięto przycisk w mathIntro:", data.response);
-    }
+    data: { phase: 'instructions', participant_id: participantId, group: group }
 };
 timeline.push(mathIntro);
 
@@ -322,10 +311,7 @@ const recognitionIntro = {
         <p>(Naciśnij ESC, aby wyjść)</p>
     `,
     choices: ['Przejdź dalej'],
-    data: { phase: 'instructions' },
-    on_finish: function(data) {
-        console.log("Kliknięto przycisk w recognitionIntro:", data.response);
-    }
+    data: { phase: 'instructions', participant_id: participantId, group: group }
 };
 timeline.push(recognitionIntro);
 
@@ -346,7 +332,6 @@ for (const word of shuffledRecognitionList) {
             phase: 'recognition'
         },
         on_finish: function(data) {
-            // Zapisz odpowiedź (0 dla "Tak", 1 dla "Nie")
             lastRecognitionResponse = data.response === 0 ? "Tak" : "Nie";
         }
     };
@@ -368,7 +353,6 @@ for (const word of shuffledRecognitionList) {
             word: word, 
             phase: 'confidence',
             recognition_summary: function() {
-                // Pobierz wartość bezpośrednio z odpowiedzi w trialu
                 const trialData = jsPsych.data.get().last(1).values()[0];
                 const confidenceValue = trialData.response ? trialData.response[`confidence_${word}`] : null;
                 return {
@@ -379,9 +363,8 @@ for (const word of shuffledRecognitionList) {
             }
         },
         on_finish: function(data) {
-            // Aktualizuj confidence_response
             data.confidence_response = data.response[`confidence_${word}`] + 1;
-            delete data.response; // Usuń starą kolumnę response
+            delete data.response;
         }
     };
     timeline.push(confidenceTrial);
@@ -396,7 +379,7 @@ const endMessage = {
         <p>Kliknij przycisk, aby zakończyć badanie.</p>
     `,
     choices: ['Zakończ'],
-    data: { phase: 'instructions' }
+    data: { phase: 'instructions', participant_id: participantId, group: group }
 };
 timeline.push(endMessage);
 
