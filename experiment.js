@@ -245,6 +245,12 @@ for (let i = 0; i < listOrder.length; i++) {
                 sentence_number: j + 1, 
                 sentence: sentences[j], 
                 phase: 'narration' 
+            },
+            on_finish: function(data) {
+                // Ostrzeżenie o zbyt szybkim klikaniu
+                if (data.rt < 300 && jsPsych.data.get().filter({phase: 'narration'}).last(3).values().every(trial => trial.rt < 300)) {
+                    alert("Prosimy czytać zdania uważnie!");
+                }
             }
         };
         timeline.push(sentenceTrial);
@@ -304,6 +310,8 @@ for (let i = 0; i < mathTasks.length; i++) {
 }
 
 // Faza rozpoznawania
+let lastRecognitionResponse = null;
+
 const recognitionIntro = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
@@ -334,9 +342,12 @@ for (const word of shuffledRecognitionList) {
             is_target: wordLists[listOrder[0]].includes(word) || 
                       wordLists[listOrder[1]].includes(word) || 
                       wordLists[listOrder[2]].includes(word) || 
-                      wordLists[listOrder[3]].includes(word) ||
-                      ['lekarz', 'wysoki', 'spragniony', 'gwizdek'].includes(word),
+                      wordLists[listOrder[3]].includes(word),
             phase: 'recognition'
+        },
+        on_finish: function(data) {
+            // Zapisz odpowiedź (0 dla "Tak", 1 dla "Nie")
+            lastRecognitionResponse = data.response === 0 ? "Tak" : "Nie";
         }
     };
     timeline.push(recognitionTrial);
@@ -351,7 +362,25 @@ for (const word of shuffledRecognitionList) {
                 name: `confidence_${word}` 
             }
         ],
-        data: { participant_id: participantId, group: group, word: word, phase: 'confidence' }
+        data: { 
+            participant_id: participantId, 
+            group: group, 
+            word: word, 
+            phase: 'confidence',
+            recognition_summary: function() {
+                const confidenceValue = jsPsych.data.getLastTrialData().values()[0].response[`confidence_${word}`];
+                return {
+                    Stimulus: word,
+                    Response: lastRecognitionResponse,
+                    ConfidenceResponse: confidenceValue + 1 // +1, bo jsPsych zapisuje 0-4 zamiast 1-5
+                };
+            }
+        },
+        on_finish: function(data) {
+            // Aktualizuj confidence_response zamiast response
+            data.confidence_response = data.response[`confidence_${word}`] + 1; // +1 dla skali 1-5
+            delete data.response; // Usuń starą kolumnę response
+        }
     };
     timeline.push(confidenceTrial);
 }
