@@ -247,8 +247,8 @@ for (let i = 0; i < listOrder.length; i++) {
                 phase: 'narration' 
             },
             on_finish: function(data) {
-                // Ostrzeżenie o zbyt szybkim klikaniu
-                if (data.rt < 300 && jsPsych.data.get().filter({phase: 'narration'}).last(3).values().every(trial => trial.rt < 300)) {
+                const lastThree = jsPsych.data.get().filter({phase: 'narration'}).last(3).values();
+                if (data.rt < 300 && lastThree.length >= 3 && lastThree.every(trial => trial.rt < 300)) {
                     alert("Prosimy czytać zdania uważnie!");
                 }
             }
@@ -368,17 +368,19 @@ for (const word of shuffledRecognitionList) {
             word: word, 
             phase: 'confidence',
             recognition_summary: function() {
-                const confidenceValue = jsPsych.data.getLastTrialData().values()[0].response[`confidence_${word}`];
+                // Pobierz wartość bezpośrednio z odpowiedzi w trialu
+                const trialData = jsPsych.data.get().last(1).values()[0];
+                const confidenceValue = trialData.response ? trialData.response[`confidence_${word}`] : null;
                 return {
                     Stimulus: word,
                     Response: lastRecognitionResponse,
-                    ConfidenceResponse: confidenceValue + 1 // +1, bo jsPsych zapisuje 0-4 zamiast 1-5
+                    ConfidenceResponse: confidenceValue !== null ? confidenceValue + 1 : null
                 };
             }
         },
         on_finish: function(data) {
-            // Aktualizuj confidence_response zamiast response
-            data.confidence_response = data.response[`confidence_${word}`] + 1; // +1 dla skali 1-5
+            // Aktualizuj confidence_response
+            data.confidence_response = data.response[`confidence_${word}`] + 1;
             delete data.response; // Usuń starą kolumnę response
         }
     };
