@@ -100,10 +100,10 @@ const groups = {
 
 // Lista słów do fazy rozpoznawania
 const fullRecognitionList = [
-    "stetoskop", "kitel", "słuchawki", "pediatra",          // LEKARZ (3,5,9,13)
-    "chłopak", "dąb", "przystojny", "długi",                // WYSOKI (3,5,9,13)
-    "sprite", "oaza", "pepsi", "woda",                      // SPRAGNIONY (3,5,9,13)
-    "sędzia", "hałas", "sport", "piłka",                    // GWIZDEK (3,5,9,13)
+    "stetoskop", "kitel", "słuchawki", "pediatra",          // LEKARZ
+    "chłopak", "dąb", "przystojny", "długi",                // WYSOKI
+    "sprite", "oaza", "pepsi", "woda",                      // SPRAGNIONY
+    "sędzia", "hałas", "sport", "piłka",                    // GWIZDEK
     "lekarz", "wysoki", "spragniony", "gwizdek",            // Słowa krytyczne
     "drzwi", "koszulka", "kelner", "młody",                 // Elementy wspólne z narracji
     "farby", "miska", "pies", "telefon", "makaron", "korona", "dżungla", "medal" // Dystraktory
@@ -353,7 +353,7 @@ for (const word of shuffledRecognitionList) {
             word: word, 
             phase: 'confidence',
             recognition_summary: function() {
-                const trialData = jsPsych.data.get().last(1).values()[0];
+                const trialData = jsPsych.data.getLastTrialData().values()[0];
                 const confidenceValue = trialData.response ? trialData.response[`confidence_${word}`] : null;
                 return {
                     Stimulus: word,
