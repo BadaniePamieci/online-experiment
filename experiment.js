@@ -96,7 +96,7 @@ const groups = {
     "neutral": ["neutral", "neutral", "neutral", "neutral"]
 };
 
-// Lista słów w ustalonej kolejności dla ConfidenceFinalSummary
+// Lista słów w ustalonej kolejności
 const criticalWords = ["lekarz", "wysoki", "spragniony", "gwizdek"];
 const commonWords = ["drzwi", "koszulka", "kelner", "młody"];
 const listWords = [
@@ -157,10 +157,21 @@ timeline.push(instructions);
 
 // Dane demograficzne
 const demographics = {
-    type: jsPsychSurveyText,
+    type: jsPsychSurveyMultiChoice,
     questions: [
-        { prompt: "Podaj swój wiek:", name: 'age', required: true, input_type: 'number' },
-        { prompt: "Podaj swoją płeć (Kobieta, Mężczyzna, Inna, Wolę nie podawać):", name: 'gender', required: true }
+        { 
+            prompt: "Podaj swój wiek (liczba w latach):", 
+            name: 'age', 
+            required: true, 
+            input_type: 'number' 
+        },
+        { 
+            prompt: "Podaj swoją płeć:", 
+            name: 'gender', 
+            required: true, 
+            options: ["Kobieta", "Mężczyzna", "Inna"], 
+            horizontal: true 
+        }
     ],
     data: { phase: 'demographics', participant_id: participantId, group: group }
 };
@@ -221,7 +232,7 @@ for (let i = 0; i < listOrder.length; i++) {
     };
     timeline.push(narrationInstructions);
 
-    let fastSentences = []; // Lista na zdania z rt < 400 ms
+    let fastSentences = []; // Lista na zdania z rt < 300 ms
 
     for (let j = 0; j < sentences.length; j++) {
         const sentenceTrial = {
@@ -242,7 +253,7 @@ for (let i = 0; i < listOrder.length; i++) {
                 phase: 'narration' 
             },
             on_finish: function(data) {
-                if (data.rt < 400) {
+                if (data.rt < 300) {
                     fastSentences.push(data.sentence);
                 }
                 const lastThree = jsPsych.data.get().filter({phase: 'narration'}).last(3).values();
@@ -253,17 +264,23 @@ for (let i = 0; i < listOrder.length; i++) {
         };
         timeline.push(sentenceTrial);
     }
+
     const narrationSummary = {
-    type: jsPsychHtmlButtonResponse,
-    stimulus: 'Kończymy narrację. Kliknij "Dalej", aby kontynuować.',
-    choices: ['Dalej'],
-    on_finish: function() {
-        const hasFastSentences = fastSentences.length > 0;
-        const fastSentencesList = hasFastSentences ? fastSentences.join('; ') : '';
-        jsPsych.data.addDataToLastTrial({
-            has_fast_sentences: hasFastSentences,
-            fast_sentences_list: fastSentencesList
+        type: jsPsychHtmlButtonResponse,
+        stimulus: 'Kończymy narrację. Kliknij "Dalej", aby kontynuować.',
+        choices: ['Dalej'],
+        on_finish: function() {
+            const hasFastSentences = fastSentences.length > 0;
+            const fastSentencesList = hasFastSentences ? fastSentences.join('; ') : '';
+            const fastSentencesCount = fastSentences.length;
+            jsPsych.data.addDataToLastTrial({
+                has_fast_sentences: hasFastSentences,
+                fast_sentences_list: fastSentencesList,
+                fast_sentences_count: fastSentencesCount
             });
+            if (fastSentencesCount >= 3) {
+                alert("Za szybko przechodzisz przez zdania. Prosimy czytać uważniej.");
+            }
         }
     };
     timeline.push(narrationSummary);
@@ -311,6 +328,13 @@ for (let i = 0; i < mathTasks.length; i++) {
             math_question: mathTasks[i].question, 
             correct_answer: mathTasks[i].answer,
             phase: 'math'
+        },
+        on_finish: function(data) {
+            const response = parseInt(data.response[`math_${i}`]);
+            data.correct = response === mathTasks[i].answer;
+            if (!data.correct) {
+                alert("Błędna odpowiedź. Proszę sprawdzić obliczenia.");
+            }
         }
     };
     timeline.push(mathTrial);
@@ -353,8 +377,9 @@ for (const word of shuffledRecognitionList) {
             recognitionData[word] = {
                 Stimulus: word,
                 Response: data.response === 0 ? "Tak" : "Nie",
-                ConfidenceResponse: null // Początkowo null, zaktualizowane w confidenceTrial
+                ConfidenceResponse: null
             };
+            data.is_fast_response = data.rt < 200;
         }
     };
     timeline.push(recognitionTrial);
@@ -376,29 +401,30 @@ for (const word of shuffledRecognitionList) {
             phase: 'confidence'
         },
         on_finish: function(data) {
-            const confidenceValue = data.response[`confidence_${word}`] + 1; // Skala 0-4 przesunięta na 1-5
+            const confidenceValue = data.response[`confidence_${word}`] + 1;
             data.confidence_response = confidenceValue;
             recognitionData[word].ConfidenceResponse = confidenceValue;
-            data.recognition_summary = recognitionData[word]; // Poprawnie zapisane recognition_summary
+            data.recognition_summary = recognitionData[word];
         }
     };
     timeline.push(confidenceTrial);
 }
 
-// Dodanie ConfidenceFinalSummary w ustalonej kolejności
-
+// Dodanie danych rozpoznawania w formacie płaskim
 const finalSummaryTrial = {
     type: jsPsychHtmlButtonResponse,
     stimulus: 'Kończymy eksperyment. Kliknij "Zakończ", aby zakończyć.',
     choices: ['Zakończ'],
     on_finish: function() {
-        const finalSummary = fixedOrderWords.map(word => 
-            recognitionData[word] || 
-            { Stimulus: word, Response: "Brak", ConfidenceResponse: "Brak" }
-        );
-        jsPsych.data.addDataToLastTrial({
-            ConfidenceFinalSummary: JSON.stringify(finalSummary)
+        const summaryData = {
+            recognition_order: JSON.stringify(shuffledRecognitionList)
+        };
+        fixedOrderWords.forEach(word => {
+            const entry = recognitionData[word] || { Response: "Brak", ConfidenceResponse: "Brak" };
+            summaryData[`recognition_response_${word}`] = entry.Response;
+            summaryData[`confidence_${word}`] = entry.ConfidenceResponse;
         });
+        jsPsych.data.addDataToLastTrial(summaryData);
     }
 };
 timeline.push(finalSummaryTrial);
