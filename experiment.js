@@ -326,10 +326,6 @@ for (let i = 0; i < mathTasks.length; i++) {
         on_finish: function(data) {
             const response = parseInt(data.response[`math_${i}`]);
             data.correct = response === mathTasks[i].answer;
-            if (!data.correct) {
-                alert("Błędna odpowiedź. Proszę sprawdzić obliczenia.");
-                jsPsych.run([mathTrial]); // Powtarza trial matematyczny
-            }
         }
     };
     timeline.push(mathTrial);
