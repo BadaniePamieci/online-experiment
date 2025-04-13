@@ -253,18 +253,16 @@ for (let i = 0; i < listOrder.length; i++) {
         };
         timeline.push(sentenceTrial);
     }
-
-    // Podsumowanie narracji z informacją o szybkich zdaniach
     const narrationSummary = {
-        type: jsPsychInstructions,
-        pages: ['Kończymy narrację.'],
-        show_clickable_nav: true,
-        on_finish: function() {
-            const hasFastSentences = fastSentences.length > 0;
-            const fastSentencesList = hasFastSentences ? fastSentences.join('; ') : '';
-            jsPsych.data.addDataToLastTrial({
-                has_fast_sentences: hasFastSentences,
-                fast_sentences_list: fastSentencesList
+    type: jsPsychHtmlButtonResponse,
+    stimulus: 'Kończymy narrację. Kliknij "Dalej", aby kontynuować.',
+    choices: ['Dalej'],
+    on_finish: function() {
+        const hasFastSentences = fastSentences.length > 0;
+        const fastSentencesList = hasFastSentences ? fastSentences.join('; ') : '';
+        jsPsych.data.addDataToLastTrial({
+            has_fast_sentences: hasFastSentences,
+            fast_sentences_list: fastSentencesList
             });
         }
     };
@@ -389,9 +387,9 @@ for (const word of shuffledRecognitionList) {
 
 // Dodanie ConfidenceFinalSummary w ustalonej kolejności
 const finalSummaryTrial = {
-    type: jsPsychInstructions,
-    pages: ['Kończymy eksperyment.'],
-    show_clickable_nav: true,
+    type: jsPsychHtmlButtonResponse,
+    stimulus: 'Kończymy eksperyment. Kliknij "Zakończ", aby zakończyć.',
+    choices: ['Zakończ'],
     on_finish: function() {
         const finalSummary = fixedOrderWords.map(word => recognitionData[word]);
         jsPsych.data.addDataToLastTrial({
