@@ -157,7 +157,7 @@ timeline.push(instructions);
 
 // Dane demograficzne
 const demographics = {
-    type: jsPsychSurveyMultiChoice,
+    type: jsPsychSurveyText,
     questions: [
         { 
             prompt: "Podaj swój wiek (liczba w latach):", 
@@ -166,14 +166,20 @@ const demographics = {
             input_type: 'number' 
         },
         { 
-            prompt: "Podaj swoją płeć:", 
+            prompt: "Podaj swoją płeć (Kobieta, Mężczyzna, Inna):", 
             name: 'gender', 
-            required: true, 
-            options: ["Kobieta", "Mężczyzna", "Inna"], 
-            horizontal: true 
+            required: true 
         }
     ],
-    data: { phase: 'demographics', participant_id: participantId, group: group }
+    data: { phase: 'demographics', participant_id: participantId, group: group },
+    on_finish: function(data) {
+        const gender = data.response.gender.trim().toLowerCase();
+        const validGenders = ['kobieta', 'mężczyzna', 'inna'];
+        if (!validGenders.includes(gender)) {
+            alert('Proszę podać poprawną płeć: Kobieta, Mężczyzna lub Inna.');
+            jsPsych.endCurrentTimeline(); // Zatrzymuje timeline, wymaga ponownego wpisania
+        }
+    }
 };
 timeline.push(demographics);
 
