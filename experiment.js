@@ -74,7 +74,7 @@ const narratives = {
     "WYSOKI": {
         "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że przechodzisz przez park w centrum miasta. Obok ciebie mężczyzna w koszulce sportowej przygotowuje się do gry. Wielki koszykarz rozgrzewa się przed meczem, opierając dłonie o słup, który sięga ponad korony drzew. Niedaleko parku stoją ogromne wieżowce o szklanych fasadach, rzucające cień na całą okolicę. Zastanawiasz się, jak ludzie wznoszą takie budynki, które wydają się dotykać nieba.",
         "non_critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że przechodzisz przez park w centrum miasta. Obok ciebie mężczyzna w koszulce sportowej przygotowuje się do gry. Koszykarz rozgrzewa się przed meczem, opierając dłonie o słup, który stoi przy boisku. Niedaleko parku stoją wieżowce o szklanych fasadach, które odbijają promienie słoneczne w twoją stronę. Jesteś zachwycony/a ich wykonaniem i zastanawiasz się, jak ludzie wznoszą takie budynki.",
-        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że siedzisz w kawiarni na starym rynku. Przez okno obserwujesz turystów fotografujących fontannę z posągiem Neptuna. Kelnerka w koszulce w kratkę nalewa Ci herbatę do filiżanki z motywem kotów. Zapach świeżo mielonej kawy miesza się z dźwiękiem delikatnego jazzu, a Ty zastanawiasz się, czy wybrać sernik czyselsz makowiec. Mówisz, że potrzebujesz jeszcze chwili, żeby wybrać."
+        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że siedzisz w kawiarni na starym rynku. Przez okno obserwujesz turystów fotografujących fontannę z posągiem Neptuna. Kelnerka w koszulce w kratkę nalewa Ci herbatę do filiżanki z motywem kotów. Zapach świeżo mielonej kawy miesza się z dźwiękiem delikatnego jazzu, a Ty zastanawiasz się, czy wybrać sernik czy makowiec. Mówisz, że potrzebujesz jeszcze chwili, żeby wybrać."
     },
     "SPRAGNIONY": {
         "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w dusznym barze po całym dniu bez picia. Kelner podaje Ci colę z lodem i plasterkiem cytryny, a Ty od razu chwytasz szklankę. Twój głodny żołądek burczy, ale najpilniejsza jest potrzeba nawodnienia. Pijesz ją duszkiem i łagodzisz ją natychmiast. Czujesz, że ciepło już ci tak bardzo nie przeszkadza i że nie masz już suchości w gardle.",
@@ -96,7 +96,7 @@ const groups = {
     "neutral": ["neutral", "neutral", "neutral", "neutral"]
 };
 
-// Lista słów w ustalonej kolejności
+// Lista słów w ustalonej kolejności dla ConfidenceFinalSummary
 const criticalWords = ["lekarz", "wysoki", "spragniony", "gwizdek"];
 const commonWords = ["drzwi", "koszulka", "kelner", "młody"];
 const listWords = [
@@ -156,23 +156,27 @@ const instructions = {
 timeline.push(instructions);
 
 // Dane demograficzne
-const demographics = {
+const ageTrial = {
     type: jsPsychSurveyText,
     questions: [
-        { prompt: "Podaj swój wiek (liczba w latach):", name: 'age', required: true, input_type: 'number' },
-        { prompt: "Podaj swoją płeć (Kobieta, Mężczyzna, Inna):", name: 'gender', required: true }
+        { prompt: "Podaj swój wiek:", name: 'age', required: true, input_type: 'number' }
     ],
+    data: { phase: 'demographics', participant_id: participantId, group: group }
+};
+timeline.push(ageTrial);
+
+const genderTrial = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: `
+        <p>Wybierz swoją płeć:</p>
+    `,
+    choices: ['Kobieta', 'Mężczyzna', 'Inna'],
     data: { phase: 'demographics', participant_id: participantId, group: group },
     on_finish: function(data) {
-        const gender = data.response.gender.trim().toLowerCase();
-        const validGenders = ['kobieta', 'mężczyzna', 'inna'];
-        if (!validGenders.includes(gender)) {
-            alert('Proszę podać poprawną płeć: Kobieta, Mężczyzna lub Inna.');
-            jsPsych.run([demographics]); // Powtarza trial demograficzny
-        }
+        data.gender = data.response === 0 ? 'Kobieta' : data.response === 1 ? 'Mężczyzna' : 'Inna';
     }
 };
-timeline.push(demographics);
+timeline.push(genderTrial);
 
 // Informacja o teście
 const testInfo = {
@@ -229,7 +233,7 @@ for (let i = 0; i < listOrder.length; i++) {
     };
     timeline.push(narrationInstructions);
 
-    let fastSentences = []; // Lista na zdania z rt < 300 ms
+    let fastSentences = []; // Lista na zdania z rt < 400 ms
 
     for (let j = 0; j < sentences.length; j++) {
         const sentenceTrial = {
@@ -250,7 +254,7 @@ for (let i = 0; i < listOrder.length; i++) {
                 phase: 'narration' 
             },
             on_finish: function(data) {
-                if (data.rt < 300) {
+                if (data.rt < 400) {
                     fastSentences.push(data.sentence);
                 }
                 const lastThree = jsPsych.data.get().filter({phase: 'narration'}).last(3).values();
@@ -261,7 +265,6 @@ for (let i = 0; i < listOrder.length; i++) {
         };
         timeline.push(sentenceTrial);
     }
-
     const narrationSummary = {
         type: jsPsychHtmlButtonResponse,
         stimulus: 'Kończymy narrację. Kliknij "Dalej", aby kontynuować.',
@@ -269,11 +272,9 @@ for (let i = 0; i < listOrder.length; i++) {
         on_finish: function() {
             const hasFastSentences = fastSentences.length > 0;
             const fastSentencesList = hasFastSentences ? fastSentences.join('; ') : '';
-            const fastSentencesCount = fastSentences.length;
             jsPsych.data.addDataToLastTrial({
                 has_fast_sentences: hasFastSentences,
-                fast_sentences_list: fastSentencesList,
-                fast_sentences_count: fastSentencesCount
+                fast_sentences_list: fastSentencesList
             });
         }
     };
@@ -322,10 +323,6 @@ for (let i = 0; i < mathTasks.length; i++) {
             math_question: mathTasks[i].question, 
             correct_answer: mathTasks[i].answer,
             phase: 'math'
-        },
-        on_finish: function(data) {
-            const response = parseInt(data.response[`math_${i}`]);
-            data.correct = response === mathTasks[i].answer;
         }
     };
     timeline.push(mathTrial);
@@ -368,9 +365,8 @@ for (const word of shuffledRecognitionList) {
             recognitionData[word] = {
                 Stimulus: word,
                 Response: data.response === 0 ? "Tak" : "Nie",
-                ConfidenceResponse: null
+                ConfidenceResponse: null // Początkowo null, zaktualizowane w confidenceTrial
             };
-            data.is_fast_response = data.rt < 200;
         }
     };
     timeline.push(recognitionTrial);
@@ -392,30 +388,28 @@ for (const word of shuffledRecognitionList) {
             phase: 'confidence'
         },
         on_finish: function(data) {
-            const confidenceValue = data.response[`confidence_${word}`] + 1;
+            const confidenceValue = data.response[`confidence_${word}`] + 1; // Skala 0-4 przesunięta na 1-5
             data.confidence_response = confidenceValue;
             recognitionData[word].ConfidenceResponse = confidenceValue;
-            data.recognition_summary = recognitionData[word];
+            data.recognition_summary = recognitionData[word]; // Poprawnie zapisane recognition_summary
         }
     };
     timeline.push(confidenceTrial);
 }
 
-// Dodanie danych rozpoznawania w formacie płaskim
+// Dodanie ConfidenceFinalSummary w ustalonej kolejności
 const finalSummaryTrial = {
     type: jsPsychHtmlButtonResponse,
     stimulus: 'Kończymy eksperyment. Kliknij "Zakończ", aby zakończyć.',
     choices: ['Zakończ'],
     on_finish: function() {
-        const summaryData = {
-            recognition_order: JSON.stringify(shuffledRecognitionList)
-        };
-        fixedOrderWords.forEach(word => {
-            const entry = recognitionData[word] || { Response: "Brak", ConfidenceResponse: "Brak" };
-            summaryData[`recognition_response_${word}`] = entry.Response;
-            summaryData[`confidence_${word}`] = entry.ConfidenceResponse;
+        const finalSummary = fixedOrderWords.map(word => 
+            recognitionData[word] || 
+            { Stimulus: word, Response: "Brak", ConfidenceResponse: "Brak" }
+        );
+        jsPsych.data.addDataToLastTrial({
+            ConfidenceFinalSummary: JSON.stringify(finalSummary)
         });
-        jsPsych.data.addDataToLastTrial(summaryData);
     }
 };
 timeline.push(finalSummaryTrial);
