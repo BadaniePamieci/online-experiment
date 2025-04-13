@@ -111,6 +111,14 @@ const fixedOrderWords = [...criticalWords, ...commonWords, ...listWords, ...cont
 // Losowa kolejność słów w fazie rozpoznawania
 const shuffledRecognitionList = jsPsych.randomization.shuffle(fixedOrderWords);
 
+// Lista słów docelowych dla weryfikacji poprawności
+const targetWords = [
+    ...wordLists["LEKARZ"],
+    ...wordLists["WYSOKI"],
+    ...wordLists["SPRAGNIONY"],
+    ...wordLists["GWIZDEK"]
+];
+
 // Zadania matematyczne
 const mathTasks = [
     { question: "2 + 2 × 3 =", answer: 8 },
@@ -221,7 +229,7 @@ for (let i = 0; i < listOrder.length; i++) {
     };
     timeline.push(narrationInstructions);
 
-    let fastSentences = []; // Lista na zdania z rt < 400 ms
+    let fastSentences = [];
 
     for (let j = 0; j < sentences.length; j++) {
         const sentenceTrial = {
@@ -317,7 +325,7 @@ for (let i = 0; i < mathTasks.length; i++) {
 }
 
 // Faza rozpoznawania
-let recognitionData = {}; // Obiekt do przechowywania danych rozpoznawania
+let recognitionData = {};
 
 const recognitionIntro = {
     type: jsPsychHtmlButtonResponse,
@@ -343,17 +351,16 @@ for (const word of shuffledRecognitionList) {
             participant_id: participantId, 
             group: group, 
             word: word,
-            is_target: wordLists[listOrder[0]].includes(word) || 
-                      wordLists[listOrder[1]].includes(word) || 
-                      wordLists[listOrder[2]].includes(word) || 
-                      wordLists[listOrder[3]].includes(word),
+            is_target: targetWords.includes(word),
             phase: 'recognition'
         },
         on_finish: function(data) {
+            const response = data.response === 0 ? "Tak" : "Nie";
             recognitionData[word] = {
-                Response: data.response === 0 ? "Tak" : "Nie",
-                ConfidenceResponse: null // Początkowo null, zaktualizowane w confidenceTrial
+                Response: response,
+                ConfidenceResponse: null
             };
+            console.log(`Recognition for ${word}:`, recognitionData[word]);
         }
     };
     timeline.push(recognitionTrial);
@@ -375,9 +382,10 @@ for (const word of shuffledRecognitionList) {
             phase: 'confidence'
         },
         on_finish: function(data) {
-            const confidenceValue = data.response[`confidence_${word}`] + 1; // Skala 0-4 przesunięta na 1-5
+            const confidenceValue = data.response[`confidence_${word}`] + 1;
             data.confidence_response = confidenceValue;
             recognitionData[word].ConfidenceResponse = confidenceValue;
+            console.log(`Confidence for ${word}:`, recognitionData[word]);
         }
     };
     timeline.push(confidenceTrial);
@@ -395,6 +403,7 @@ const finalSummaryTrial = {
             const wordData = recognitionData[word] || { Response: 'Brak odpowiedzi', ConfidenceResponse: 'Brak odpowiedzi' };
             summaryData[`recognition_response_${word}`] = wordData.Response;
             summaryData[`confidence_${word}`] = wordData.ConfidenceResponse;
+            console.log(`Summary for ${word}:`, wordData);
         });
         jsPsych.data.addDataToLastTrial(summaryData);
     }
