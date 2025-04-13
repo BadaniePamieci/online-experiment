@@ -74,7 +74,7 @@ const narratives = {
     "WYSOKI": {
         "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że przechodzisz przez park w centrum miasta. Obok ciebie mężczyzna w koszulce sportowej przygotowuje się do gry. Wielki koszykarz rozgrzewa się przed meczem, opierając dłonie o słup, który sięga ponad korony drzew. Niedaleko parku stoją ogromne wieżowce o szklanych fasadach, rzucające cień na całą okolicę. Zastanawiasz się, jak ludzie wznoszą takie budynki, które wydają się dotykać nieba.",
         "non_critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że przechodzisz przez park w centrum miasta. Obok ciebie mężczyzna w koszulce sportowej przygotowuje się do gry. Koszykarz rozgrzewa się przed meczem, opierając dłonie o słup, który stoi przy boisku. Niedaleko parku stoją wieżowce o szklanych fasadach, które odbijają promienie słoneczne w twoją stronę. Jesteś zachwycony/a ich wykonaniem i zastanawiasz się, jak ludzie wznoszą takie budynki.",
-        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że siedzisz w kawiarni na starym rynku. Przez okno obserwujesz turystów fotografujących fontannę z posągiem Neptuna. Kelnerka w koszulce w kratkę nalewa Ci herbatę do filiżanki z motywem kotów. Zapach świeżo mielonej kawy miesza się z dźwiękiem delikatnego jazzu, a Ty zastanawiasz się, czy wybrać sernik czy makowiec. Mówisz, że potrzebujesz jeszcze chwili, żeby wybrać."
+        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że siedzisz w kawiarni na starym rynku. Przez okno obserwujesz turystów fotografujących fontannę z posągiem Neptuna. Kelnerka w koszulce w kratkę nalewa Ci herbatę do filiżanki z motywem kotów. Zapach świeżo mielonej kawy miesza się z dźwiękiem delikatnego jazzu, a Ty zastanawiasz się, czy wybrać sernik czyselsz makowiec. Mówisz, że potrzebujesz jeszcze chwili, żeby wybrać."
     },
     "SPRAGNIONY": {
         "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w dusznym barze po całym dniu bez picia. Kelner podaje Ci colę z lodem i plasterkiem cytryny, a Ty od razu chwytasz szklankę. Twój głodny żołądek burczy, ale najpilniejsza jest potrzeba nawodnienia. Pijesz ją duszkiem i łagodzisz ją natychmiast. Czujesz, że ciepło już ci tak bardzo nie przeszkadza i że nie masz już suchości w gardle.",
@@ -159,17 +159,8 @@ timeline.push(instructions);
 const demographics = {
     type: jsPsychSurveyText,
     questions: [
-        { 
-            prompt: "Podaj swój wiek (liczba w latach):", 
-            name: 'age', 
-            required: true, 
-            input_type: 'number' 
-        },
-        { 
-            prompt: "Podaj swoją płeć (Kobieta, Mężczyzna, Inna):", 
-            name: 'gender', 
-            required: true 
-        }
+        { prompt: "Podaj swój wiek (liczba w latach):", name: 'age', required: true, input_type: 'number' },
+        { prompt: "Podaj swoją płeć (Kobieta, Mężczyzna, Inna):", name: 'gender', required: true }
     ],
     data: { phase: 'demographics', participant_id: participantId, group: group },
     on_finish: function(data) {
@@ -177,7 +168,7 @@ const demographics = {
         const validGenders = ['kobieta', 'mężczyzna', 'inna'];
         if (!validGenders.includes(gender)) {
             alert('Proszę podać poprawną płeć: Kobieta, Mężczyzna lub Inna.');
-            jsPsych.endCurrentTimeline(); // Zatrzymuje timeline, wymaga ponownego wpisania
+            jsPsych.run([demographics]); // Powtarza trial demograficzny
         }
     }
 };
@@ -284,9 +275,6 @@ for (let i = 0; i < listOrder.length; i++) {
                 fast_sentences_list: fastSentencesList,
                 fast_sentences_count: fastSentencesCount
             });
-            if (fastSentencesCount >= 3) {
-                alert("Za szybko przechodzisz przez zdania. Prosimy czytać uważniej.");
-            }
         }
     };
     timeline.push(narrationSummary);
@@ -340,6 +328,7 @@ for (let i = 0; i < mathTasks.length; i++) {
             data.correct = response === mathTasks[i].answer;
             if (!data.correct) {
                 alert("Błędna odpowiedź. Proszę sprawdzić obliczenia.");
+                jsPsych.run([mathTrial]); // Powtarza trial matematyczny
             }
         }
     };
