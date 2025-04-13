@@ -253,16 +253,18 @@ for (let i = 0; i < listOrder.length; i++) {
         };
         timeline.push(sentenceTrial);
     }
+
     const narrationSummary = {
-    type: jsPsychHtmlButtonResponse,
-    stimulus: 'Kończymy narrację. Kliknij "Dalej", aby kontynuować.',
-    choices: ['Dalej'],
-    on_finish: function() {
-        const hasFastSentences = fastSentences.length > 0;
-        const fastSentencesList = hasFastSentences ? fastSentences.join('; ') : '';
-        jsPsych.data.addDataToLastTrial({
-            has_fast_sentences: hasFastSentences,
-            fast_sentences_list: fastSentencesList
+        type: jsPsychHtmlButtonResponse,
+        stimulus: 'Kończymy narrację. Kliknij "Dalej", aby kontynuować.',
+        choices: ['Dalej'],
+        data: { phase: 'narration_summary', participant_id: participantId, group: group },
+        on_finish: function() {
+            const hasFastSentences = fastSentences.length > 0;
+            const fastSentencesList = hasFastSentences ? fastSentences.join('; ') : '';
+            jsPsych.data.addDataToLastTrial({
+                has_fast_sentences: hasFastSentences,
+                fast_sentences_list: fastSentencesList
             });
         }
     };
@@ -385,19 +387,24 @@ for (const word of shuffledRecognitionList) {
     timeline.push(confidenceTrial);
 }
 
-// Dodanie ConfidenceFinalSummary w ustalonej kolejności
-const finalSummaryTrial = {
-    type: jsPsychHtmlButtonResponse,
-    stimulus: 'Kończymy eksperyment. Kliknij "Zakończ", aby zakończyć.',
-    choices: ['Zakończ'],
-    on_finish: function() {
-        const finalSummary = fixedOrderWords.map(word => recognitionData[word]);
-        jsPsych.data.addDataToLastTrial({
-            ConfidenceFinalSummary: finalSummary
-        });
-    }
-};
-timeline.push(finalSummaryTrial);
+// Dodanie ConfidenceFinalSummary w ustalonej kolejności jako osobne wiersze
+for (const word of fixedOrderWords) {
+    const summaryTrial = {
+        type: jsPsychInstructions,
+        pages: [''], // Pusty tekst, aby nic nie wyświetlać
+        show_clickable_nav: false,
+        allow_backward: false,
+        data: {
+            phase: 'summary',
+            participant_id: participantId,
+            group: group,
+            stimulus: word,
+            Response: recognitionData[word]?.Response || 'Brak odpowiedzi',
+            ConfidenceResponse: recognitionData[word]?.ConfidenceResponse || 'Brak odpowiedzi'
+        }
+    };
+    timeline.push(summaryTrial);
+}
 
 // Zakończenie eksperymentu
 const endMessage = {
