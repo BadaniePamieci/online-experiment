@@ -397,22 +397,24 @@ for (const word of shuffledRecognitionList) {
     timeline.push(confidenceTrial);
 }
 
-// Dodanie ConfidenceFinalSummary w ustalonej kolejności
-const finalSummaryTrial = {
-    type: jsPsychHtmlButtonResponse,
-    stimulus: 'Kończymy eksperyment. Kliknij "Zakończ", aby zakończyć.',
-    choices: ['Zakończ'],
-    on_finish: function() {
-        const finalSummary = fixedOrderWords.map(word => 
-            recognitionData[word] || 
-            { Stimulus: word, Response: "Brak", ConfidenceResponse: "Brak" }
-        );
-        jsPsych.data.addDataToLastTrial({
-            ConfidenceFinalSummary: JSON.stringify(finalSummary)
-        });
-    }
-};
-timeline.push(finalSummaryTrial);
+// Dodanie danych rozpoznawania w osobnych wierszach
+for (const word of fixedOrderWords) {
+    const recognitionSummaryTrial = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: '', // Pusty ekran, tylko zapis danych
+        choices: [],
+        trial_duration: 0, // Natychmiastowe przejście
+        data: {
+            phase: 'recognition_summary',
+            participant_id: participantId,
+            group: group,
+            Stimulus: word,
+            Response: recognitionData[word] ? recognitionData[word].Response : "Brak",
+            ConfidenceResponse: recognitionData[word] ? recognitionData[word].ConfidenceResponse : "Brak"
+        }
+    };
+    timeline.push(recognitionSummaryTrial);
+}
 
 // Zakończenie eksperymentu
 const endMessage = {
