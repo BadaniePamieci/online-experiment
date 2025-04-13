@@ -20,8 +20,6 @@ const participantId = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 1
 let groupCounter = localStorage.getItem('groupCounter') ? parseInt(localStorage.getItem('groupCounter')) : 0;
 const groupNames = ["critical", "non_critical", "neutral"];
 const group = groupNames[groupCounter % groupNames.length];
-
-// Zwiększ licznik po przypisaniu grupy
 groupCounter = (groupCounter + 1) % groupNames.length;
 localStorage.setItem('groupCounter', groupCounter);
 
@@ -98,19 +96,20 @@ const groups = {
     "neutral": ["neutral", "neutral", "neutral", "neutral"]
 };
 
-// Lista słów do fazy rozpoznawania
-const fullRecognitionList = [
+// Lista słów w ustalonej kolejności dla ConfidenceFinalSummary
+const criticalWords = ["lekarz", "wysoki", "spragniony", "gwizdek"];
+const commonWords = ["drzwi", "koszulka", "kelner", "młody"];
+const listWords = [
     "stetoskop", "kitel", "słuchawki", "pediatra",          // LEKARZ
     "chłopak", "dąb", "przystojny", "długi",                // WYSOKI
     "sprite", "oaza", "pepsi", "woda",                      // SPRAGNIONY
-    "sędzia", "hałas", "sport", "piłka",                    // GWIZDEK
-    "lekarz", "wysoki", "spragniony", "gwizdek",            // Słowa krytyczne
-    "drzwi", "koszulka", "kelner", "młody",                 // Elementy wspólne z narracji
-    "farby", "miska", "pies", "telefon", "makaron", "korona", "dżungla", "medal" // Dystraktory
+    "sędzia", "hałas", "sport", "piłka"                     // GWIZDEK
 ];
+const controlWords = ["farby", "miska", "pies", "telefon", "makaron", "korona", "dżungla", "medal"];
+const fixedOrderWords = [...criticalWords, ...commonWords, ...listWords, ...controlWords];
 
-// Losowe przemieszanie listy słów do rozpoznawania
-const shuffledRecognitionList = jsPsych.randomization.shuffle(fullRecognitionList);
+// Losowa kolejność słów w fazie rozpoznawania
+const shuffledRecognitionList = jsPsych.randomization.shuffle(fixedOrderWords);
 
 // Zadania matematyczne
 const mathTasks = [
@@ -222,6 +221,8 @@ for (let i = 0; i < listOrder.length; i++) {
     };
     timeline.push(narrationInstructions);
 
+    let fastSentences = []; // Lista na zdania z rt < 400 ms
+
     for (let j = 0; j < sentences.length; j++) {
         const sentenceTrial = {
             type: jsPsychHtmlButtonResponse,
@@ -241,6 +242,9 @@ for (let i = 0; i < listOrder.length; i++) {
                 phase: 'narration' 
             },
             on_finish: function(data) {
+                if (data.rt < 400) {
+                    fastSentences.push(data.sentence);
+                }
                 const lastThree = jsPsych.data.get().filter({phase: 'narration'}).last(3).values();
                 if (data.rt < 300 && lastThree.length >= 3 && lastThree.every(trial => trial.rt < 300)) {
                     alert("Prosimy czytać zdania uważnie!");
@@ -249,6 +253,22 @@ for (let i = 0; i < listOrder.length; i++) {
         };
         timeline.push(sentenceTrial);
     }
+
+    // Podsumowanie narracji z informacją o szybkich zdaniach
+    const narrationSummary = {
+        type: jsPsychInstructions,
+        pages: ['Kończymy narrację.'],
+        show_clickable_nav: true,
+        on_finish: function() {
+            const hasFastSentences = fastSentences.length > 0;
+            const fastSentencesList = hasFastSentences ? fastSentences.join('; ') : '';
+            jsPsych.data.addDataToLastTrial({
+                has_fast_sentences: hasFastSentences,
+                fast_sentences_list: fastSentencesList
+            });
+        }
+    };
+    timeline.push(narrationSummary);
 
     // Przerwa między listami (oprócz ostatniej)
     if (i < listOrder.length - 1) {
@@ -299,7 +319,7 @@ for (let i = 0; i < mathTasks.length; i++) {
 }
 
 // Faza rozpoznawania
-let lastRecognitionResponse = null;
+let recognitionData = {}; // Obiekt do przechowywania danych rozpoznawania
 
 const recognitionIntro = {
     type: jsPsychHtmlButtonResponse,
@@ -332,7 +352,11 @@ for (const word of shuffledRecognitionList) {
             phase: 'recognition'
         },
         on_finish: function(data) {
-            lastRecognitionResponse = data.response === 0 ? "Tak" : "Nie";
+            recognitionData[word] = {
+                Stimulus: word,
+                Response: data.response === 0 ? "Tak" : "Nie",
+                ConfidenceResponse: null // Początkowo null, zaktualizowane w confidenceTrial
+            };
         }
     };
     timeline.push(recognitionTrial);
@@ -351,24 +375,31 @@ for (const word of shuffledRecognitionList) {
             participant_id: participantId, 
             group: group, 
             word: word, 
-            phase: 'confidence',
-            recognition_summary: function() {
-                const trialData = jsPsych.data.getLastTrialData().values()[0];
-                const confidenceValue = trialData.response ? trialData.response[`confidence_${word}`] : null;
-                return {
-                    Stimulus: word,
-                    Response: lastRecognitionResponse,
-                    ConfidenceResponse: confidenceValue !== null ? confidenceValue + 1 : null
-                };
-            }
+            phase: 'confidence'
         },
         on_finish: function(data) {
-            data.confidence_response = data.response[`confidence_${word}`] + 1;
-            delete data.response;
+            const confidenceValue = data.response[`confidence_${word}`] + 1; // Skala 0-4 przesunięta na 1-5
+            data.confidence_response = confidenceValue;
+            recognitionData[word].ConfidenceResponse = confidenceValue;
+            data.recognition_summary = recognitionData[word]; // Poprawnie zapisane recognition_summary
         }
     };
     timeline.push(confidenceTrial);
 }
+
+// Dodanie ConfidenceFinalSummary w ustalonej kolejności
+const finalSummaryTrial = {
+    type: jsPsychInstructions,
+    pages: ['Kończymy eksperyment.'],
+    show_clickable_nav: true,
+    on_finish: function() {
+        const finalSummary = fixedOrderWords.map(word => recognitionData[word]);
+        jsPsych.data.addDataToLastTrial({
+            ConfidenceFinalSummary: finalSummary
+        });
+    }
+};
+timeline.push(finalSummaryTrial);
 
 // Zakończenie eksperymentu
 const endMessage = {
