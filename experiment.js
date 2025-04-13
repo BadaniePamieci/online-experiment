@@ -127,11 +127,12 @@ const timeline = [];
 const welcomeScreen = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
-        <h2>Badanie pamięci online</h2>
-        <p>To badanie zajmie około 20 minut. Prosimy wykonać je w skupieniu, w cichym pomieszczeniu, aby uniknąć rozproszenia.</p>
-        <p>Prosimy przechodzić przez zadania i teksty płynnie, bez zatrzymywania się. Twój czas będzie mierzony.</p>
-        <p>Jeśli naciśniesz ESC, Twoje dane nie będą brane pod uwagę. Dane nie będą również uwzględniane, jeśli wykryjemy, że nie czytasz tekstów.</p>
+        <h2>Badanie pamięci</h2>
         <p>Badanie wymaga użycia ekranu komputera lub laptopa. Jeśli nie możesz teraz użyć takiego urządzenia, naciśnij ESC i wróć później.</p>
+        <p>To badanie zajmie około 20 minut. Proszę wykonać je w skupieniu, w cichym pomieszczeniu, aby uniknąć rozproszenia.</p>
+        <p>Konieczne jest przechodzenie przez zadania i teksty płynnie, bez zatrzymywania się. Twój czas będzie mierzony.</p>
+        <p>Jeśli naciśniesz ESC, Twoje dane nie będą brane pod uwagę. </p>
+        
         <p>Jeśli jesteś gotowy/a, kliknij przycisk poniżej, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
@@ -143,12 +144,12 @@ timeline.push(welcomeScreen);
 const instructions = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
-        <h2>Witamy w badaniu pamięci</h2>
-        <p>W tym badaniu wyświetlone zostaną listy słów. Każde słowo będzie pokazywane pojedynczo przez krótki czas, z przerwą między słowami.</p>
-        <p>Twoim zadaniem jest zapamiętanie jak największej liczby słów z każdej listy. Po każdej liście przeczytasz krótki tekst. Na koniec weźmiesz udział w teście rozpoznawania słów.</p>
+        <h2>Witam w badaniu pamięci</h2>
+        <p>Za chwilę zostaną wyświetlone listy słów. Każde słowo z listy będzie pokazywane pojedynczo przez krótki czas, z przerwą między słowami.</p>
+        <p>Twoim zadaniem jest zapamiętanie jak największej liczby słów z każdej listy. Wymaga to pełnego skupienia. Po każdej wyświetlonej liście przeczytasz krótki tekst. </p>
+        <p>Dane nie będą uwzględniane, jeśli wykryte zostanie, że nie czytasz tekstów. Na koniec weźmiesz udział w teście pamięci.</p>
         <p>Wszystkie dane są anonimowe i będą wykorzystywane wyłącznie do celów naukowych.</p>
         <p>Kliknij przycisk poniżej, aby kontynuować.</p>
-        <p>(Naciśnij ESC, aby wyjść w dowolnym momencie)</p>
     `,
     choices: ['Przejdź dalej'],
     data: { phase: 'instructions', participant_id: participantId, group: group }
@@ -159,7 +160,7 @@ timeline.push(instructions);
 const ageTrial = {
     type: jsPsychSurveyText,
     questions: [
-        { prompt: "Podaj swój wiek:", name: 'age', required: true, input_type: 'number' }
+        { prompt: "Podaj swój wiek:(liczbę lat)", name: 'age', required: true, input_type: 'number' }
     ],
     data: { phase: 'demographics', participant_id: participantId, group: group }
 };
@@ -184,6 +185,7 @@ const testInfo = {
     stimulus: `
         <h2>Zaraz zacznie się test</h2>
         <p>Przygotuj się do zapamiętywania słów z list.</p>
+        <p>Po kliknięciu przycisku od razu wyświetlone zostaną słowa</p>
         <p>Kliknij przycisk, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
@@ -261,34 +263,26 @@ for (let i = 0; i < listOrder.length; i++) {
                 if (data.rt < 300 && lastThree.length >= 3 && lastThree.every(trial => trial.rt < 300)) {
                     alert("Prosimy czytać zdania uważnie!");
                 }
+                // Zapis fastSentences dla ostatniego zdania
+                if (j === sentences.length - 1) {
+                    const hasFastSentences = fastSentences.length > 0;
+                    const fastSentencesList = hasFastSentences ? fastSentences.join('; ') : '';
+                    data.has_fast_sentences = hasFastSentences;
+                    data.fast_sentences_list = fastSentencesList;
+                }
             }
         };
         timeline.push(sentenceTrial);
     }
-    const narrationSummary = {
-        type: jsPsychHtmlButtonResponse,
-        stimulus: 'Kończymy narrację. Kliknij "Dalej", aby kontynuować.',
-        choices: ['Dalej'],
-        on_finish: function() {
-            const hasFastSentences = fastSentences.length > 0;
-            const fastSentencesList = hasFastSentences ? fastSentences.join('; ') : '';
-            jsPsych.data.addDataToLastTrial({
-                has_fast_sentences: hasFastSentences,
-                fast_sentences_list: fastSentencesList
-            });
-        }
-    };
-    timeline.push(narrationSummary);
 
     // Przerwa między listami (oprócz ostatniej)
     if (i < listOrder.length - 1) {
         const breakTrial = {
             type: jsPsychHtmlButtonResponse,
             stimulus: `
-                <p>Krótka przerwa...</p>
+                <p>Proszę od razu przejść dalej</p>
                 <p>Przygotuj się na następną listę słów.</p>
                 <p>Kliknij przycisk, aby kontynuować.</p>
-                <p>(Naciśnij ESC, aby wyjść)</p>
             `,
             choices: ['Przejdź dalej'],
             data: { phase: 'instructions', participant_id: participantId, group: group }
@@ -302,9 +296,8 @@ const mathIntro = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
         <p>Teraz rozwiąż kilka prostych zadań matematycznych.</p>
-        <p>Wpisz odpowiedź liczbową w polu tekstowym. Upewnij się, że uwzględniasz kolejność działań (mnożenie i dzielenie przed dodawaniem i odejmowaniem).</p>
+        <p>Wpisz odpowiedź liczbową w polu tekstowym. </p>
         <p>Kliknij przycisk, aby kontynuować.</p>
-        <p>(Naciśnij ESC, aby wyjść)</p>
     `,
     choices: ['Przejdź dalej'],
     data: { phase: 'instructions', participant_id: participantId, group: group }
@@ -334,11 +327,10 @@ let recognitionData = {}; // Obiekt do przechowywania danych rozpoznawania
 const recognitionIntro = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
-        <p>Teraz zobaczysz pojedyncze słowa. Twoim zadaniem jest określenie, czy dane słowo pojawiło się wcześniej na którejś z list słów (nie w tekstach).</p>
+        <p>Teraz zobaczysz pojedyncze słowa. Twoim zadaniem jest określenie, czy dane słowo pojawiło się wcześniej na którejś z czterech list słów.</p>
         <p>Jeśli słowo było na liście, naciśnij „Tak”. Jeśli nie, naciśnij „Nie”.</p>
         <p>Po każdym wyborze ocenisz swoją pewność na skali od 1 (zupełnie niepewny/a) do 5 (całkowicie pewny/a).</p>
         <p>Kliknij przycisk, aby kontynuować.</p>
-        <p>(Naciśnij ESC, aby wyjść)</p>
     `,
     choices: ['Przejdź dalej'],
     data: { phase: 'instructions', participant_id: participantId, group: group }
@@ -350,7 +342,7 @@ for (const word of shuffledRecognitionList) {
         type: jsPsychHtmlButtonResponse,
         stimulus: `<h1>${word}</h1>`,
         choices: ['Tak', 'Nie'],
-        prompt: '<p>Czy to słowo pojawiło się wcześniej?</p>',
+        prompt: '<p>Czy to słowo pojawiło się wcześniej na którejś z list?</p>',
         data: { 
             participant_id: participantId, 
             group: group, 
@@ -397,24 +389,22 @@ for (const word of shuffledRecognitionList) {
     timeline.push(confidenceTrial);
 }
 
-// Dodanie danych rozpoznawania w osobnych wierszach
-for (const word of fixedOrderWords) {
-    const recognitionSummaryTrial = {
-        type: jsPsychHtmlButtonResponse,
-        stimulus: '', // Pusty ekran, tylko zapis danych
-        choices: [],
-        trial_duration: 0, // Natychmiastowe przejście
-        data: {
-            phase: 'recognition_summary',
-            participant_id: participantId,
-            group: group,
-            Stimulus: word,
-            Response: recognitionData[word] ? recognitionData[word].Response : "Brak",
-            ConfidenceResponse: recognitionData[word] ? recognitionData[word].ConfidenceResponse : "Brak"
-        }
-    };
-    timeline.push(recognitionSummaryTrial);
-}
+// Dodanie ConfidenceFinalSummary w ustalonej kolejności
+const finalSummaryTrial = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: 'Badanie zostało ukończone. Kliknij "Zakończ", aby zakończyć.',
+    choices: ['Zakończ'],
+    on_finish: function() {
+        const finalSummary = fixedOrderWords.map(word => 
+            recognitionData[word] || 
+            { Stimulus: word, Response: "Brak", ConfidenceResponse: "Brak" }
+        );
+        jsPsych.data.addDataToLastTrial({
+            ConfidenceFinalSummary: JSON.stringify(finalSummary)
+        });
+    }
+};
+timeline.push(finalSummaryTrial);
 
 // Zakończenie eksperymentu
 const endMessage = {
