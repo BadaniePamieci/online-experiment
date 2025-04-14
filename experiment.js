@@ -126,7 +126,6 @@ const timeline = [];
 // Zmienne do śledzenia czasu i danych
 let firstWordTime = null;
 let lastRecognitionTime = null;
-let narrationRTs = []; // Lista na czasy reakcji narracji
 
 // Ekran początkowy
 const welcomeScreen = {
@@ -137,7 +136,6 @@ const welcomeScreen = {
         <p>To badanie zajmie około 20 minut. Proszę wykonać je w skupieniu, w cichym pomieszczeniu, aby uniknąć rozproszenia.</p>
         <p>Konieczne jest przechodzenie przez zadania i teksty płynnie, bez zatrzymywania się. Twój czas będzie mierzony.</p>
         <p>Jeśli naciśniesz ESC, Twoje dane nie będą brane pod uwagę. </p>
-        
         <p>Jeśli jesteś gotowy/a, kliknij przycisk poniżej, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
@@ -238,24 +236,14 @@ for (let i = 0; i < listOrder.length; i++) {
         timeline.push(wordTrial);
     }
 
-    // Narracja
+    // Narracja (bez instrukcji wstępnej)
     const narrationType = groups[group][i];
     const narrationText = narratives[listName][narrationType];
     const sentences = narrationText.split('.').map(s => s.trim()).filter(s => s);
 
-    const narrationInstructions = {
-        type: jsPsychHtmlButtonResponse,
-        stimulus: `
-            <p>Przeczytaj poniższe zdania i kliknij „Dalej”, gdy tylko będziesz gotowy/a.</p>
-            <p>(Naciśnij ESC, aby wyjść)</p>
-        `,
-        choices: ['Przejdź dalej'],
-        data: { phase: 'instructions', participant_id: participantId, group: group }
-    };
-    timeline.push(narrationInstructions);
-
     let fastSentences = []; // Lista na zdania z rt < 400 ms
     let veryFastSentences = []; // Lista na zdania z rt < 300 ms (dla FastSentencesRows)
+    let narrationRTs = []; // Lista na czasy reakcji dla danej narracji
 
     for (let j = 0; j < sentences.length; j++) {
         const sentenceTrial = {
@@ -276,7 +264,7 @@ for (let i = 0; i < listOrder.length; i++) {
                 phase: 'narration' 
             },
             on_finish: function(data) {
-                // Zbieranie RT do obliczenia średniej
+                // Zbieranie RT dla danej narracji
                 narrationRTs.push(data.rt);
                 
                 // Sprawdzanie szybkich odpowiedzi
@@ -298,9 +286,9 @@ for (let i = 0; i < listOrder.length; i++) {
                     data.fast_sentences_list = fastSentencesList;
                     // Zapis veryFastSentences jako lista wierszy
                     data.FastSentencesRows = veryFastSentences.length > 0 ? veryFastSentences : [];
-                    // Obliczenie średniej RT dla narracji
+                    // Obliczenie średniej RT dla danej narracji z nazwą listy
                     const meanRT = narrationRTs.length > 0 ? (narrationRTs.reduce((a, b) => a + b, 0) / narrationRTs.length).toFixed(2) : null;
-                    data.MeanNarrationRT = meanRT;
+                    data.MeanNarrationRT = meanRT ? `${listName}:${meanRT}` : null;
                 }
                 // Zapis DaneOsob dla każdego trialu narracji
                 data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
@@ -314,9 +302,7 @@ for (let i = 0; i < listOrder.length; i++) {
         const breakTrial = {
             type: jsPsychHtmlButtonResponse,
             stimulus: `
-                <p>Proszę od razu przejść dalej</p>
-                <p>Przygotuj się na następną listę słów.</p>
-                <p>Kliknij przycisk, aby kontynuować.</p>
+                <p>Od razu przejdź dalej.</p>
             `,
             choices: ['Przejdź dalej'],
             data: { phase: 'instructions', participant_id: participantId, group: group }
