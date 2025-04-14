@@ -108,21 +108,8 @@ const listWords = [
 const controlWords = ["farby", "miska", "pies", "telefon", "makaron", "korona", "dżungla", "medal"];
 const fixedOrderWords = [...criticalWords, ...commonWords, ...listWords, ...controlWords];
 
-// Walidacja fixedOrderWords
-if (fixedOrderWords.length !== 32) {
-    console.error("fixedOrderWords ma nieprawidłową liczbę elementów:", fixedOrderWords.length);
-}
-
 // Losowa kolejność słów w fazie rozpoznawania
-let shuffledRecognitionList = jsPsych.randomization.shuffle(fixedOrderWords);
-
-// Walidacja shuffledRecognitionList
-console.log("shuffledRecognitionList przed walidacją:", shuffledRecognitionList);
-if (shuffledRecognitionList.length !== 32 || !fixedOrderWords.every(word => shuffledRecognitionList.includes(word))) {
-    console.error("shuffledRecognitionList nie zawiera wszystkich słów lub ma nieprawidłową liczbę elementów:", shuffledRecognitionList.length);
-    shuffledRecognitionList = jsPsych.randomization.shuffle(fixedOrderWords); // Ponowne tasowanie
-    console.log("shuffledRecognitionList po naprawie:", shuffledRecognitionList);
-}
+const shuffledRecognitionList = jsPsych.randomization.shuffle(fixedOrderWords);
 
 // Zadania matematyczne
 const mathTasks = [
@@ -136,11 +123,6 @@ const mathTasks = [
 // Timeline eksperymentu
 const timeline = [];
 
-// Zmienne do śledzenia czasu i danych
-let firstWordTime = null;
-let lastRecognitionTime = null;
-let recognitionData = {};
-
 // Ekran początkowy
 const welcomeScreen = {
     type: jsPsychHtmlButtonResponse,
@@ -150,6 +132,7 @@ const welcomeScreen = {
         <p>To badanie zajmie około 20 minut. Proszę wykonać je w skupieniu, w cichym pomieszczeniu, aby uniknąć rozproszenia.</p>
         <p>Konieczne jest przechodzenie przez zadania i teksty płynnie, bez zatrzymywania się. Twój czas będzie mierzony.</p>
         <p>Jeśli naciśniesz ESC, Twoje dane nie będą brane pod uwagę. </p>
+        
         <p>Jeśli jesteś gotowy/a, kliknij przycisk poniżej, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
@@ -174,18 +157,12 @@ const instructions = {
 timeline.push(instructions);
 
 // Dane demograficzne
-let participantAge = null;
-let participantGender = null;
-
 const ageTrial = {
     type: jsPsychSurveyText,
     questions: [
         { prompt: "Podaj swój wiek:(liczbę lat)", name: 'age', required: true, input_type: 'number' }
     ],
-    data: { phase: 'demographics', participant_id: participantId, group: group },
-    on_finish: function(data) {
-        participantAge = data.response.age;
-    }
+    data: { phase: 'demographics', participant_id: participantId, group: group }
 };
 timeline.push(ageTrial);
 
@@ -198,8 +175,6 @@ const genderTrial = {
     data: { phase: 'demographics', participant_id: participantId, group: group },
     on_finish: function(data) {
         data.gender = data.response === 0 ? 'Kobieta' : data.response === 1 ? 'Mężczyzna' : 'Inna';
-        participantGender = data.gender;
-        data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender}`;
     }
 };
 timeline.push(genderTrial);
@@ -239,12 +214,6 @@ for (let i = 0; i < listOrder.length; i++) {
                 trial_number: i + 1, 
                 word: word, 
                 phase: 'word_list' 
-            },
-            on_start: function() {
-                // Zapis czasu pierwszego słowa
-                if (firstWordTime === null && i === 0 && word === wordList[0]) {
-                    firstWordTime = performance.now();
-                }
             }
         };
         timeline.push(wordTrial);
@@ -266,9 +235,7 @@ for (let i = 0; i < listOrder.length; i++) {
     };
     timeline.push(narrationInstructions);
 
-    let fastSentences = [];
-    let veryFastSentences = [];
-    let narrationRTs = [];
+    let fastSentences = []; // Lista na zdania z rt < 400 ms
 
     for (let j = 0; j < sentences.length; j++) {
         const sentenceTrial = {
@@ -279,7 +246,6 @@ for (let i = 0; i < listOrder.length; i++) {
                 <p>Kliknij przycisk, aby przejść dalej.</p>
             `,
             choices: ['Przejdź dalej'],
-            trial_duration: 500, // Zablokowanie narracji
             data: { 
                 participant_id: participantId, 
                 group: group, 
@@ -290,32 +256,26 @@ for (let i = 0; i < listOrder.length; i++) {
                 phase: 'narration' 
             },
             on_finish: function(data) {
-                narrationRTs.push(data.rt);
                 if (data.rt < 400) {
                     fastSentences.push(data.sentence);
-                }
-                if (data.rt < 300) {
-                    veryFastSentences.push(data.sentence);
                 }
                 const lastThree = jsPsych.data.get().filter({phase: 'narration'}).last(3).values();
                 if (data.rt < 300 && lastThree.length >= 3 && lastThree.every(trial => trial.rt < 300)) {
                     alert("Prosimy czytać zdania uważnie!");
                 }
+                // Zapis fastSentences dla ostatniego zdania
                 if (j === sentences.length - 1) {
                     const hasFastSentences = fastSentences.length > 0;
                     const fastSentencesList = hasFastSentences ? fastSentences.join('; ') : '';
                     data.has_fast_sentences = hasFastSentences;
                     data.fast_sentences_list = fastSentencesList;
-                    data.FastSentencesRows = veryFastSentences.length > 0 ? veryFastSentences : [];
-                    const meanRT = narrationRTs.length > 0 ? (narrationRTs.reduce((a, b) => a + b, 0) / narrationRTs.length).toFixed(2) : null;
-                    data.MeanNarrationRT = meanRT ? `${listName}:${meanRT}` : null;
                 }
-                data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
             }
         };
         timeline.push(sentenceTrial);
     }
 
+    // Przerwa między listami (oprócz ostatniej)
     if (i < listOrder.length - 1) {
         const breakTrial = {
             type: jsPsychHtmlButtonResponse,
@@ -362,6 +322,8 @@ for (let i = 0; i < mathTasks.length; i++) {
 }
 
 // Faza rozpoznawania
+let recognitionData = {}; // Obiekt do przechowywania danych rozpoznawania
+
 const recognitionIntro = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
@@ -381,7 +343,6 @@ for (const word of shuffledRecognitionList) {
         stimulus: `<h1>${word}</h1>`,
         choices: ['Tak', 'Nie'],
         prompt: '<p>Czy to słowo pojawiło się wcześniej na którejś z list?</p>',
-        trial_duration: 500, // Zablokowanie 500 ms
         data: { 
             participant_id: participantId, 
             group: group, 
@@ -393,19 +354,11 @@ for (const word of shuffledRecognitionList) {
             phase: 'recognition'
         },
         on_finish: function(data) {
-            const response = data.response === 0 ? "Tak" : data.response === 1 ? "Nie" : "Brak";
             recognitionData[word] = {
                 Stimulus: word,
-                Response: response,
-                ConfidenceResponse: null
+                Response: data.response === 0 ? "Tak" : "Nie",
+                ConfidenceResponse: null // Początkowo null, zaktualizowane w confidenceTrial
             };
-            console.log(`Zapisano recognition dla słowa: ${word}, response: ${response}, trial_index: ${data.trial_index}`);
-            if (word === shuffledRecognitionList[shuffledRecognitionList.length - 1]) {
-                lastRecognitionTime = performance.now();
-                const timeToComplete = lastRecognitionTime - firstWordTime;
-                data.TimeToComplete = Math.round(timeToComplete);
-            }
-            data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
         }
     };
     timeline.push(recognitionTrial);
@@ -420,7 +373,6 @@ for (const word of shuffledRecognitionList) {
                 name: `confidence_${word}` 
             }
         ],
-        trial_duration: 500, // Zablokowanie 500 ms
         data: { 
             participant_id: participantId, 
             group: group, 
@@ -428,40 +380,27 @@ for (const word of shuffledRecognitionList) {
             phase: 'confidence'
         },
         on_finish: function(data) {
-            const confidenceValue = data.response[`confidence_${word}`] + 1;
+            const confidenceValue = data.response[`confidence_${word}`] + 1; // Skala 0-4 przesunięta na 1-5
             data.confidence_response = confidenceValue;
             recognitionData[word].ConfidenceResponse = confidenceValue;
-            data.recognition_summary = recognitionData[word];
-            console.log(`Zapisano confidence dla słowa: ${word}, confidence: ${confidenceValue}, trial_index: ${data.trial_index}`);
-            data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
+            data.recognition_summary = recognitionData[word]; // Poprawnie zapisane recognition_summary
         }
     };
     timeline.push(confidenceTrial);
 }
 
-// Dodanie ConfidenceFinalSummary
+// Dodanie ConfidenceFinalSummary w ustalonej kolejności
 const finalSummaryTrial = {
     type: jsPsychHtmlButtonResponse,
     stimulus: 'Badanie zostało ukończone. Kliknij "Zakończ", aby zakończyć.',
     choices: ['Zakończ'],
     on_finish: function() {
-        // Sprawdzenie brakujących słów
-        const missingWords = fixedOrderWords.filter(word => !recognitionData[word]);
-        if (missingWords.length > 0) {
-            console.error("Brakujące słowa w recognitionData:", missingWords);
-        } else {
-            console.log("Wszystkie 32 słowa zapisane w recognitionData:", Object.keys(recognitionData));
-        }
-        // Wypełnienie brakujących słów
         const finalSummary = fixedOrderWords.map(word => 
             recognitionData[word] || 
             { Stimulus: word, Response: "Brak", ConfidenceResponse: "Brak" }
         );
-        console.log("ConfidenceFinalSummary:", finalSummary);
         jsPsych.data.addDataToLastTrial({
-            ConfidenceFinalSummary: JSON.stringify(finalSummary),
-            TimeToComplete: Math.round(lastRecognitionTime - firstWordTime),
-            DaneOsob: `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`
+            ConfidenceFinalSummary: JSON.stringify(finalSummary)
         });
     }
 };
@@ -476,10 +415,7 @@ const endMessage = {
         <p>Kliknij przycisk, aby zakończyć badanie.</p>
     `,
     choices: ['Zakończ'],
-    data: { phase: 'instructions', participant_id: participantId, group: group },
-    on_finish: function(data) {
-        data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
-    }
+    data: { phase: 'instructions', participant_id: participantId, group: group }
 };
 timeline.push(endMessage);
 
