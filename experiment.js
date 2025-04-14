@@ -166,7 +166,7 @@ let participantGender = null;
 const ageTrial = {
     type: jsPsychSurveyText,
     questions: [
-        { prompt: "Podaj swój wiek:(liczbę lat)", name: 'age', required: true, input_type: 'number' }
+        { prompt: "Podaj swój wiek(liczbę lat)", name: 'age', required: true, input_type: 'number' }
     ],
     data: { phase: 'demographics', participant_id: participantId, group: group },
     on_finish: function(data) {
