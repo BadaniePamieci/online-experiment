@@ -148,7 +148,7 @@ const instructions = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
         <h2>Witam w badaniu pamięci</h2>
-        <p>Za chwilę zostaną wyświetlone listy słów. Każde słowo z listy będzie pokazywane pojedynczo przez krótki czas, z przerwą między słowami.</p>
+        <p>Za chwilę zostaną wyświetlone listy słów. Każde słowo z listy będzie wyświetlane pojedynczo, przez krótki czas z przerwą między słowami.</p>
         <p>Twoim zadaniem jest zapamiętanie jak największej liczby słów z każdej listy. Wymaga to pełnego skupienia. Po każdej wyświetlonej liście przeczytasz krótki tekst. </p>
         <p>Dane nie będą uwzględniane, jeśli wykryte zostanie, że nie czytasz tekstów. Na koniec weźmiesz udział w teście pamięci.</p>
         <p>Wszystkie dane są anonimowe i będą wykorzystywane wyłącznie do celów naukowych.</p>
