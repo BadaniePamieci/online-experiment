@@ -146,7 +146,7 @@ timeline.push(welcomeScreen);
 const instructions = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
-        <h2>Witam w badaniu pamięci</h2>
+        <h2>Witam w badaniu pamięci!</h2>
         <p>Za chwilę zostaną wyświetlone listy słów. Każde słowo z listy będzie wyświetlane pojedynczo, przez krótki czas z przerwą między słowami.</p>
         <p>Twoim zadaniem jest zapamiętanie jak największej liczby słów z każdej listy. Wymaga to pełnego skupienia. Po każdej wyświetlonej liście przeczytasz krótki tekst. </p>
         <p>Konieczne jest przechodzenie przez zadania i teksty płynnie, bez zatrzymywania się. Twój czas będzie mierzony.</p>
@@ -166,7 +166,7 @@ let participantGender = null;
 const ageTrial = {
     type: jsPsychSurveyText,
     questions: [
-        { prompt: "Podaj swój wiek(liczbę lat)", name: 'age', required: true, input_type: 'number' }
+        { prompt: "Podaj swój wiek (liczbę lat)", name: 'age', required: true, input_type: 'number' }
     ],
     data: { phase: 'demographics', participant_id: participantId, group: group },
     on_finish: function(data) {
@@ -199,7 +199,7 @@ const testInfo = {
         <p>Po kliknięciu przycisku od razu wyświetlone zostaną słowa</p>
         <p>Kliknij przycisk, aby kontynuować.</p>
     `,
-    choices: ['Przejdź dalej'],
+    choices: ['Rozpocznij badanie'],
     data: { phase: 'instructions', participant_id: participantId, group: group }
 };
 timeline.push(testInfo);
