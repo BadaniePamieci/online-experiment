@@ -136,7 +136,7 @@ const welcomeScreen = {
         <p>To badanie zajmie około 20 minut. Proszę wykonaj je w skupieniu w cichym pomieszczeniu, aby uniknąć rozproszenia.</p>
         <p>Zadbaj o wyciszenie powiadomień, tak żeby w trakcie badania pojawiała się tylko jego treść. </p>
         <p>Jeśli naciśniesz ESC, Twoje dane nie będą brane pod uwagę. </p>
-        <p>Jeśli jesteś gotowy/a, kliknij przycisk poniżej, aby kontynuować.</p>
+        <p>Jeśli jesteś gotowy/a, kliknij przycisk poniżej, aby kontynuować i przejść do instrukcji.</p>
     `,
     choices: ['Przejdź dalej'],
     data: { phase: 'welcome', participant_id: participantId, group: group }
