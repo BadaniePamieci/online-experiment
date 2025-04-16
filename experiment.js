@@ -126,6 +126,7 @@ const timeline = [];
 // Zmienne do śledzenia czasu i danych
 let firstWordTime = null;
 let lastRecognitionTime = null;
+let recognitionResults = []; // Globalna lista na wyniki rozpoznawania
 
 // Ekran początkowy
 const welcomeScreen = {
@@ -347,8 +348,6 @@ for (let i = 0; i < mathTasks.length; i++) {
 }
 
 // Faza rozpoznawania
-let recognitionData = {}; // Obiekt do przechowywania danych rozpoznawania
-
 const recognitionIntro = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
@@ -380,11 +379,8 @@ for (const word of shuffledRecognitionList) {
             phase: 'recognition'
         },
         on_finish: function(data) {
-            recognitionData[word] = {
-                Stimulus: word,
-                Response: data.response === 0 ? "Tak" : "Nie",
-                ConfidenceResponse: null // Początkowo null, zaktualizowane w confidenceTrial
-            };
+            const response = data.response === 0 ? "Tak" : "Nie";
+            data.response_text = response; // Zapis tekstowej odpowiedzi
             // Zapis czasu ostatniego słowa w recognition
             if (word === shuffledRecognitionList[shuffledRecognitionList.length - 1]) {
                 lastRecognitionTime = performance.now();
@@ -417,8 +413,17 @@ for (const word of shuffledRecognitionList) {
         on_finish: function(data) {
             const confidenceValue = data.response[`confidence_${word}`] + 1; // Skala 0-4 przesunięta na 1-5
             data.confidence_response = confidenceValue;
-            recognitionData[word].ConfidenceResponse = confidenceValue;
-            data.recognition_summary = recognitionData[word];
+            // Pobierz dane z poprzedniego trialu rozpoznawania
+            const lastRecognition = jsPsych.data.get().last(1).values()[0];
+            const summary = {
+                Stimulus: word,
+                Response: lastRecognition.response_text,
+                ConfidenceResponse: confidenceValue
+            };
+            // Zapis summary do wyników
+            recognitionResults.push(summary);
+            data.recognition_summary = JSON.stringify(summary);
+            data.ConfidenceFinalSummary = JSON.stringify(summary);
             // Zapis DaneOsob
             data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
         }
@@ -437,11 +442,8 @@ const endMessage = {
     choices: ['Zakończ i zapisz'],
     data: { phase: 'instructions', participant_id: participantId, group: group },
     on_finish: function(data) {
-        const finalSummary = fixedOrderWords.map(word => 
-            recognitionData[word] || 
-            { Stimulus: word, Response: "Brak", ConfidenceResponse: "Brak" }
-        );
-        data.ConfidenceFinalSummary = JSON.stringify(finalSummary);
+        data.recognition_summary = JSON.stringify(recognitionResults);
+        data.ConfidenceFinalSummary = JSON.stringify(recognitionResults);
         data.TimeToComplete = Math.round(lastRecognitionTime - firstWordTime);
         data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
     }
