@@ -133,7 +133,7 @@ const welcomeScreen = {
     stimulus: `
         <h2>Dzień dobry!</h2>
         <p>To badanie wymaga użycia ekranu komputera lub laptopa. Jeśli nie możesz teraz użyć takiego urządzenia, naciśnij ESC i wróć później.</p>
-        <p>To badanie zajmie około 20 minut. Proszę wykonaj je w skupieniu w cichym pomieszczeniu, aby uniknąć rozproszenia.</p>
+        <p>To badanie zajmie około 10 minut. Proszę wykonaj je w skupieniu w cichym pomieszczeniu, aby uniknąć rozproszenia.</p>
         <p>Zadbaj o wyciszenie powiadomień, tak żeby w trakcie badania pojawiała się tylko jego treść. </p>
         <p>Jeśli naciśniesz ESC, Twoje dane nie będą brane pod uwagę. </p>
         <p>Jeśli jesteś gotowy/a, kliknij przycisk poniżej, aby kontynuować i przejść do instrukcji.</p>
