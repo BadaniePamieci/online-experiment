@@ -231,7 +231,6 @@ for (let i = 0; i < listOrder.length; i++) {
                 phase: 'word_list' 
             },
             on_start: function() {
-                // Zapis czasu pierwszego słowa
                 if (firstWordTime === null && i === 0 && word === wordList[0]) {
                     firstWordTime = performance.now();
                 }
@@ -240,21 +239,19 @@ for (let i = 0; i < listOrder.length; i++) {
         timeline.push(wordTrial);
     }
 
-    // Narracja (bez instrukcji wstępnej)
+    // Narracja
     const narrationType = groups[group][i];
     const narrationText = narratives[listName][narrationType];
     const sentences = narrationText.split('.').map(s => s.trim()).filter(s => s);
 
-    let fastSentences = []; // Lista na zdania z rt < 400 ms
-    let veryFastSentences = []; // Lista na zdania z rt < 300 ms (dla FastSentencesRows)
-    let narrationRTs = []; // Lista na czasy reakcji dla danej narracji
+    let fastSentences = [];
+    let veryFastSentences = [];
+    let narrationRTs = [];
 
     for (let j = 0; j < sentences.length; j++) {
         const sentenceTrial = {
             type: jsPsychHtmlButtonResponse,
-            stimulus: `
-                <p>${sentences[j]}</p>
-            `,
+            stimulus: `<p>${sentences[j]}</p>`,
             choices: ['Przejdź dalej'],
             data: { 
                 participant_id: participantId, 
@@ -266,10 +263,7 @@ for (let i = 0; i < listOrder.length; i++) {
                 phase: 'narration' 
             },
             on_finish: function(data) {
-                // Zbieranie RT dla danej narracji
                 narrationRTs.push(data.rt);
-                
-                // Sprawdzanie szybkich odpowiedzi
                 if (data.rt < 400) {
                     fastSentences.push(data.sentence);
                 }
@@ -280,32 +274,27 @@ for (let i = 0; i < listOrder.length; i++) {
                 if (data.rt < 300 && lastThree.length >= 3 && lastThree.every(trial => trial.rt < 300)) {
                     alert("Prosimy czytać zdania uważnie!");
                 }
-                // Zapis dla ostatniego zdania
                 if (j === sentences.length - 1) {
                     const hasFastSentences = fastSentences.length > 0;
                     const fastSentencesList = hasFastSentences ? fastSentences.join('; ') : '';
-                    const fastSentencesRows = veryFastSentences.length > 0 ? `[${veryFastSentences.map(s => `"${s}"`).join(',')}]` : '[]';
+                    const fastSentencesRows = veryFastSentences.length > 0 ? JSON.stringify(veryFastSentences) : '[]';
                     data.has_fast_sentences = hasFastSentences;
                     data.fast_sentences_list = fastSentencesList;
                     data.FastSentencesRows = fastSentencesRows;
-                    // Obliczenie średniej RT dla danej narracji z nazwą listy
                     const meanRT = narrationRTs.length > 0 ? (narrationRTs.reduce((a, b) => a + b, 0) / narrationRTs.length).toFixed(2) : null;
                     data.MeanNarrationRT = meanRT ? `${listName}:${meanRT}` : null;
                 }
-                // Zapis DaneOsob dla każdego trialu narracji
                 data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
             }
         };
         timeline.push(sentenceTrial);
     }
 
-    // Przerwa między listami (oprócz ostatniej)
+    // Przerwa między listami
     if (i < listOrder.length - 1) {
         const breakTrial = {
             type: jsPsychHtmlButtonResponse,
-            stimulus: `
-                <p>Od razu przejdź dalej do kolejnej listy.</p>
-            `,
+            stimulus: `<p>Od razu przejdź dalej do kolejnej listy.</p>`,
             choices: ['Przejdź dalej'],
             data: { phase: 'instructions', participant_id: participantId, group: group }
         };
@@ -344,7 +333,7 @@ for (let i = 0; i < mathTasks.length; i++) {
 }
 
 // Faza rozpoznawania
-let recognitionData = {}; // Obiekt do przechowywania danych rozpoznawania
+let recognitionData = {};
 
 const recognitionIntro = {
     type: jsPsychHtmlButtonResponse,
@@ -382,15 +371,13 @@ for (const word of shuffledRecognitionList) {
             recognitionData[word] = {
                 Stimulus: word,
                 Response: data.response_text,
-                ConfidenceResponse: null // Początkowo null, zaktualizowane w confidenceTrial
+                ConfidenceResponse: null
             };
-            // Zapis czasu ostatniego słowa w recognition
             if (word === shuffledRecognitionList[shuffledRecognitionList.length - 1]) {
                 lastRecognitionTime = performance.now();
                 const timeToComplete = lastRecognitionTime - firstWordTime;
                 data.TimeToComplete = Math.round(timeToComplete);
             }
-            // Zapis DaneOsob
             data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
         }
     };
@@ -413,28 +400,32 @@ for (const word of shuffledRecognitionList) {
             phase: 'confidence'
         },
         on_finish: function(data) {
-            const confidenceValue = data.response[`confidence_${word}`] + 1; // Skala 0-4 przesunięta na 1-5
-            data.confidence_response = confidenceValue;
+            const confidenceValue = data.response[`confidence_${word}`] + 1; // Skala 0-4 mapowana na 1-5
             recognitionData[word].ConfidenceResponse = confidenceValue;
-            data.recognition_summary = JSON.stringify(recognitionData[word]);
-            // Zapis DaneOsob
+            data.confidence_response = confidenceValue;
+            data.recognition_summary = JSON.stringify({
+                Stimulus: word,
+                Response: recognitionData[word].Response,
+                ConfidenceResponse: confidenceValue
+            });
             data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
         }
     };
     timeline.push(confidenceTrial);
 }
 
-// Dodanie ConfidenceFinalSummary w ustalonej kolejności
+// Final Summary
 const finalSummaryTrial = {
     type: jsPsychHtmlButtonResponse,
     stimulus: 'Badanie zostało ukończone. Kliknij "Zakończ", aby zakończyć.',
     choices: ['Zakończ'],
     data: { phase: 'instructions', participant_id: participantId, group: group },
     on_finish: function(data) {
-        const finalSummary = fixedOrderWords.map(word => 
-            recognitionData[word] || 
-            { Stimulus: word, Response: "Brak", ConfidenceResponse: "Brak" }
-        );
+        const finalSummary = fixedOrderWords.map(word => ({
+            Stimulus: word,
+            Response: recognitionData[word]?.Response || "Brak",
+            ConfidenceResponse: recognitionData[word]?.ConfidenceResponse || "Brak"
+        }));
         data.ConfidenceFinalSummary = JSON.stringify(finalSummary);
         data.TimeToComplete = Math.round(lastRecognitionTime - firstWordTime);
         data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
