@@ -84,7 +84,7 @@ const narratives = {
     "GWIZDEK": {
         "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że jesteś na sali gimnastycznej podczas w-f. Młody trener krzyczy, byście ustawili się w rzędzie. Słyszysz wyraźny hałas z zewnątrz i przestajesz skupiać się na lekcji. Za oknem dostrzegasz policjanta, który kieruje ruchem po wypadku samochodowym, wydając wysokie dźwięki. Zapatrzony w okno nagle słyszysz niechciany, głośny sygnał i wiesz, że musisz znowu zacząć biegać na hali.",
         "non_critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że jesteś na sali gimnastycznej podczas w-f. Młody trener krzyczy, byście ustawili się w rzędzie. Ty jednak nie skupiasz się na lekcji, bo za oknem dostrzegasz policjanta, który kieruje ruchem po wypadku samochodowym. Zapatrzony w okno słyszysz dźwięk głosu trenera, który mówi że musisz się skupić. To twój sygnał, żeby znowu zacząć biegać na hali.",
-        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że przeglądasz stare zdjęcia w albumie na poddaszu babci. Kurz unosi się w promieniach słońca wpadających przez okno, a na półkach stoją pudełka z porcelanowymi figurkami. Na jednym ze zdjęć widzisz bardzo młodego Siebie, trzymającego pluszowego misia w kapeluszu. Pachnie tu lawendą i starą drewnianą podłogą. Zastanawiasz się, czy zabrać któreś zdjęcie do ramki."
+        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że przeglądasz stare zdjęcia w albumie na poddaszu babci. Kurz unosi się w promieniach słońca wpadających przez okno, a na półkach stoją pudełka z porcelanowymi figurkami. Na jednym ze zdjęć widzisz bardzo młodego Siebie, trzymającego pluszowego misia w kapeluszu. Pachnie tu lawendą i starą drewnianą podłogą. Zastanawiasz się, czy zabrać któreś zdjęcie do Twojego pokoju."
     }
 };
 
@@ -155,7 +155,7 @@ const instructions = {
         <p>Cała procedura jest anonimowa, a wyniki będą wykorzystywane wyłącznie do celów naukowych.</p>
         <p>W dowonym momencie badania możesz zrezygnować z udziału w nim (naciskając ESC), a twoje wyniki nie będą brane pod uwagę w analizie.</p>
         <p>Rozpoczęcie procedury jest jednoznaczne z wyrażeniem zgody na udział w badaniu.</p>
-        <p>Kliknij przycisk poniżej, aby podać swój wiek i płeć</p>
+        <p>Kliknij przycisk poniżej, aby podać swój wiek i płeć.</p>
     `,
     choices: ['Przejdź dalej'],
     data: { phase: 'instructions', participant_id: participantId, group: group }
@@ -306,7 +306,7 @@ for (let i = 0; i < listOrder.length; i++) {
         const breakTrial = {
             type: jsPsychHtmlButtonResponse,
             stimulus: `
-                <p>Od razu przejdź dalej.</p>
+                <p>Od razu przejdź dalej do kolejnej listy.</p>
             `,
             choices: ['Przejdź dalej'],
             data: { phase: 'instructions', participant_id: participantId, group: group }
@@ -355,6 +355,7 @@ const recognitionIntro = {
         <p>Teraz zobaczysz pojedyncze słowa. Twoim zadaniem jest określenie, czy dane słowo pojawiło się wcześniej na którejś z czterech list słów.</p>
         <p>Jeśli słowo było na liście, naciśnij „Tak”. Jeśli nie, naciśnij „Nie”.</p>
         <p>Po każdym wyborze ocenisz swoją pewność na skali od 1 (zupełnie niepewny/a) do 5 (całkowicie pewny/a).</p>
+        <p>Przykładowo jeżeli jesteś pewny/a że danego słowa nie było na liście, to zaznacz „Nie", a potem 5 w skali pewności. </p>       
         <p>Kliknij przycisk, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
