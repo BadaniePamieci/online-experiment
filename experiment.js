@@ -1,3 +1,4 @@
+// Inicjalizacja jsPsych
 const jsPsych = initJsPsych({
     on_finish: function() {
         const data = jsPsych.data.get();
@@ -66,26 +67,27 @@ const wordLists = {
 // Narracje
 const narratives = {
     "LEKARZ": {
-        "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w zatłoczonej poczekalni szpitala. Przez uchylone drzwi gabinetu widzisz pielęgniarkę, która pobiera krew nastolatkowi. W pomieszczeniu obok mężczyzna ubrany na biało słucha staruszki opisującej kaszel. Przez korytarz przechodzi pacjent z receptą w dłoni, którą wypisał mu ktoś przed chwilą. Czekasz, aż ktoś udzieli ci pomocy, a chłodne powietrze i stukot klawiatur sprawiają, że chcesz jak najszybciej iść do domu.",
-        "non_critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w zatłoczonej poczekalni szpitala. Przez uchylone drzwi gabinetu widzisz pielęgniarkę, która pobiera krew nastolatkowi. Niedaleko ciebie widzisz staruszkę, która ma kaszel. Przez korytarz przechodzi pacjent z receptą na leki, których koniecznie potrzebuje. Czekasz na pomoc, a chłodne powietrze i stukot klawiatur sprawiają, że chcesz jak najszybciej iść do domu.",
-        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że siedzisz w cichej czytelni biblioteki. Przez półotwarte drzwi widzisz osobę układającą książki na półce. Obok Ciebie studentka przewraca strony notesu, szukając ważnego cytatu. Na środku stolik z gazetami, a przez okno wpada ciepłe światło poranka. Czekasz na otwarcie archiwum, a szelest papieru i zapach kawy sprawiają, że czujesz się wspaniale."
+        "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w zatłoczonej poczekalni szpitala. Przez uchylone drzwi gabinetu widzisz pielęgniarkę, która pobiera krew nastolatkowi. W pomieszczeniu obok mężczyzna ubrany na biało słucha staruszki, która kaszle. Przez korytarz przechodzi pacjent z receptą w dłoni, którą ktoś mu przed chwilą wypisał. Czekasz, aż ktoś udzieli Ci pomocy, a chłodne powietrze i stukot klawiatur sprawiają, że chcesz jak najszybciej iść do domu.",
+        "non_critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w zatłoczonej poczekalni szpitala. Przez uchylone drzwi gabinetu widzisz pielęgniarkę, która pobiera krew nastolatkowi. Niedaleko ciebie widzisz staruszkę, która ma kaszel. Przez korytarz przechodzi pacjent z receptą w dłoni. Czekasz na pomoc, a chłodne powietrze i stukot klawiatur sprawiają, że chcesz jak najszybciej iść do domu.",
+        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Teraz w ramach przerwy wyobraź sobie, że siedzisz w cichej czytelni biblioteki. Przez półotwarte drzwi widzisz osobę układającą książki na półce. Obok Ciebie studentka przewraca strony notesu, szukając ważnego zdania. Na środku stoi stolik z gazetami, a przez okno wpada ciepłe światło poranka. Czekasz na otwarcie archiwum, a szelest papieru i zapach kawy sprawiają, że czujesz się wspaniale."
     },
     "WYSOKI": {
-        "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że przechodzisz przez park w centrum miasta. Obok ciebie mężczyzna w koszulce sportowej przygotowuje się do gry. Wielki koszykarz rozgrzewa się przed meczem, opierając dłonie o słup, który sięga ponad korony drzew. Niedaleko parku stoją ogromne wieżowce o szklanych fasadach, rzucające cień na całą okolicę. Zastanawiasz się, jak ludzie wznoszą takie budynki, które wydają się dotykać nieba.",
-        "non_critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że przechodzisz przez park w centrum miasta. Obok ciebie mężczyzna w koszulce sportowej przygotowuje się do gry. Koszykarz rozgrzewa się przed meczem, opierając dłonie o słup, który stoi przy boisku. Niedaleko parku stoją wieżowce o szklanych fasadach, które odbijają promienie słoneczne w twoją stronę. Jesteś zachwycony/a ich wykonaniem i zastanawiasz się, jak ludzie wznoszą takie budynki.",
-        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że siedzisz w kawiarni na starym rynku. Przez okno obserwujesz turystów fotografujących fontannę z posągiem Neptuna. Kelnerka w koszulce w kratkę nalewa Ci herbatę do filiżanki z motywem kotów. Zapach świeżo mielonej kawy miesza się z dźwiękiem delikatnego jazzu, a Ty zastanawiasz się, czy wybrać sernik czy makowiec. Mówisz, że potrzebujesz jeszcze chwili, żeby wybrać."
+        "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że przechodzisz przez park w centrum miasta. Obok Ciebie mężczyzna w koszulce sportowej przygotowuje się do gry. Wielki koszykarz rozgrzewa się przed meczem, opierając dłonie o słup, który sięga ponad korony drzew. Niedaleko parku stoją ogromne wieżowce o szklanych fasadach, rzucające cień na całą okolicę. Zastanawiasz się, jak ludzie wznoszą takie budynki, które wydają się dotykać nieba.",
+        "non_critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że przechodzisz przez park w centrum miasta. Obok Ciebie mężczyzna w koszulce sportowej przygotowuje się do gry. Koszykarz rozgrzewa się przed meczem, opierając dłonie o słup, który stoi przy boisku. Niedaleko parku stoją wieżowce o szklanych fasadach, które odbijają promienie słoneczne w twoją stronę. Jesteś zachwycony/a ich wykonaniem i zastanawiasz się, jak ludzie wznoszą takie budynki.",
+        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Teraz w ramach przerwy wyobraź sobie, że siedzisz w kawiarni na starym rynku. Przez okno obserwujesz turystów fotografujących fontannę z posągiem Neptuna. Kelnerka w koszulce w kratkę nalewa Ci herbatę do filiżanki z motywem kotów. Zapach świeżo mielonej kawy miesza się z dźwiękiem delikatnego jazzu, a Ty zastanawiasz się, czy wybrać sernik czy makowiec. Mówisz, że potrzebujesz jeszcze chwili, żeby wybrać."
     },
     "SPRAGNIONY": {
-        "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w dusznym barze po całym dniu bez picia. Kelner podaje Ci colę z lodem i plasterkiem cytryny, a Ty od razu chwytasz szklankę. Twój głodny żołądek burczy, ale najpilniejsza jest potrzeba nawodnienia. Pijesz ją duszkiem i łagodzisz ją natychmiast. Czujesz, że ciepło już ci tak bardzo nie przeszkadza i że nie masz już suchości w gardle.",
-        "non_critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w barze w letni wieczór. Jesteś głodny, ale stać Cię na jedną rzecz. Kelner podaje Ci colę z lodem i plasterkiem cytryny, a Ty spokojnie delektujesz się piciem. Smakuje dobrze jak zawsze i myślisz, że dobrze wydałeś pieniądze. Czujesz się już dużo lepiej i nie czujesz potrzeby zostać dłużej, więc niedługo później wracasz do domu.",
-        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że stoisz na przystanku tramwajowym w deszczowy poranek. Obok Ciebie kobieta w przezroczystym parasolu czyta e-booka. Przy przystanku jest twoja ulubiona restauracja, a ty widzisz jak kelner serwuje główne danie. Odwracasz wzrok i widzisz, jak szynach kołysze się opuszczona reklamówka, a z głośnika słychać komunikat o opóźnieniu. Myślisz, że dziś lepiej było wziąć tę drugą parę butów, bo zaczyna bardziej padać."
+        "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w dusznym barze po całym dniu bez picia. Kelner podaje Ci colę z lodem i plasterkiem cytryny, a Ty od razu chwytasz szklankę. Twój głodny żołądek burczy, ale najpilniejsza jest potrzeba nawodnienia. Pijesz ją duszkiem i łagodzisz ją natychmiast. Zauważasz, że ciepło już Ci tak bardzo nie przeszkadza i czujesz jak ustępuje suchość w gardle.",
+        "non_critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w barze w letni wieczór. Jesteś głodny, ale stać Cię na jedną rzecz. Kelner podaje Ci colę z lodem i plasterkiem cytryny, a Ty spokojnie delektujesz się piciem. Smakuje dobrze jak zawsze i myślisz, że dobrze wydałeś pieniądze. Czujesz się już dużo lepiej i nie czujesz potrzeby zostać dłużej, więc chwilę później wracasz do domu.",
+        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że stoisz na przystanku tramwajowym w deszczowy poranek. Obok Ciebie kobieta w przezroczystym parasolu czyta w skupieniu e-booka. Przy przystanku jest twoja ulubiona restauracja, a Ty widzisz jak kelner serwuje główne danie. Odwracasz wzrok i widzisz, jak szynach kołysze się opuszczona reklamówka, a z głośnika słychać komunikat o opóźnieniu. Myślisz, że dziś lepiej było wziąć tę drugą parę butów, bo zaczyna bardziej padać."
     },
     "GWIZDEK": {
-        "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że jesteś na sali gimnastycznej podczas w-f. Młody trener krzyczy, byście ustawili się w rzędzie. Słyszysz wyraźny hałas z zewnątrz i przestajesz skupiać się na lekcji. Za oknem dostrzegasz policjanta, który kieruje ruchem po wypadku samochodowym, wydając wysokie dźwięki. Zapatrzony w okno nagle słyszysz niechciany, głośny sygnał i wiesz, że musisz zacząć biegać okrążenia na hali.",
-        "non_critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że jesteś na sali gimnastycznej podczas w-f. Młody trener krzyczy, byście ustawili się w rzędzie. Ty jednak nie skupiasz się na lekcji, bo za oknem dostrzegasz policjanta, który kieruje ruchem po wypadku samochodowym. Zapatrzony w okno słyszysz dźwięk głosu trenera, który mówi, że musisz się skupić. To twój sygnał, żeby zacząć biegać okrążenia na hali.",
-        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że przeglądasz stare zdjęcia w albumie na poddaszu babci. Kurz unosi się w promieniach słońca wpadających przez okno, a na półkach stoją pudełka z porcelanowymi figurkami. Na jednym ze zdjęć widzisz siebie jako młode dziecko, trzymające pluszowego misia w kapeluszu. Pachnie tu lawendą i starą drewnianą podłogą. Zastanawiasz się, czy zabrać któreś zdjęcie do ramki."
+        "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że jesteś na sali gimnastycznej podczas w-f. Młody trener krzyczy, byście ustawili się w rzędzie. Słyszysz wyraźny hałas z zewnątrz i przestajesz skupiać się na lekcji. Za oknem dostrzegasz policjanta, który kieruje ruchem po wypadku samochodowym, wydając wysokie dźwięki. Zapatrzony w okno nagle słyszysz niechciany, głośny sygnał i wiesz, że musisz znowu zacząć biegać na hali.",
+        "non_critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że jesteś na sali gimnastycznej podczas w-f. Młody trener krzyczy, byście ustawili się w rzędzie. Ty jednak nie skupiasz się na lekcji, bo za oknem dostrzegasz policjanta, który kieruje ruchem po wypadku samochodowym. Zapatrzony w okno słyszysz dźwięk głosu trenera, który mówi że musisz się skupić. To twój sygnał, żeby znowu zacząć biegać na hali.",
+        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że przeglądasz stare zdjęcia w albumie na poddaszu babci. Kurz unosi się w promieniach słońca wpadających przez okno, a na półkach stoją pudełka z porcelanowymi figurkami. Na jednym ze zdjęć widzisz bardzo młodego Siebie, trzymającego pluszowego misia w kapeluszu. Pachnie tu lawendą i starą drewnianą podłogą. Zastanawiasz się, czy zabrać któreś zdjęcie do Twojego pokoju."
     }
 };
+
 
 // Losowa kolejność list
 const listOrder = jsPsych.randomization.shuffle(["LEKARZ", "WYSOKI", "SPRAGNIONY", "GWIZDEK"]);
@@ -125,8 +127,6 @@ const timeline = [];
 // Zmienne do śledzenia czasu i danych
 let firstWordTime = null;
 let lastRecognitionTime = null;
-let participantAge = null;
-let participantGender = null;
 
 // Ekran początkowy
 const welcomeScreen = {
@@ -164,6 +164,9 @@ const instructions = {
 timeline.push(instructions);
 
 // Dane demograficzne
+let participantAge = null;
+let participantGender = null;
+
 const ageTrial = {
     type: jsPsychSurveyText,
     questions: [
@@ -184,7 +187,9 @@ const genderTrial = {
     choices: ['Kobieta', 'Mężczyzna', 'Inna'],
     data: { phase: 'demographics', participant_id: participantId, group: group },
     on_finish: function(data) {
-        participantGender = data.response === 0 ? 'Kobieta' : data.response === 1 ? 'Mężczyzna' : 'Inna';
+        data.gender = data.response === 0 ? 'Kobieta' : data.response === 1 ? 'Mężczyzna' : 'Inna';
+        participantGender = data.gender;
+        data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender}`;
     }
 };
 timeline.push(genderTrial);
@@ -228,6 +233,7 @@ for (let i = 0; i < listOrder.length; i++) {
                 phase: 'word_list' 
             },
             on_start: function() {
+                // Zapis czasu pierwszego słowa
                 if (firstWordTime === null && i === 0 && word === wordList[0]) {
                     firstWordTime = performance.now();
                 }
@@ -236,19 +242,23 @@ for (let i = 0; i < listOrder.length; i++) {
         timeline.push(wordTrial);
     }
 
-    // Narracja
+    // Narracja (bez instrukcji wstępnej)
     const narrationType = groups[group][i];
     const narrationText = narratives[listName][narrationType];
     const sentences = narrationText.split('.').map(s => s.trim()).filter(s => s);
 
-    let fastSentences = [];
-    let veryFastSentences = [];
-    let narrationRTs = [];
+    let fastSentences = []; // Lista na zdania z rt < 400 ms
+    let veryFastSentences = []; // Lista na zdania z rt < 300 ms (dla FastSentencesRows)
+    let narrationRTs = []; // Lista na czasy reakcji dla danej narracji
 
     for (let j = 0; j < sentences.length; j++) {
         const sentenceTrial = {
             type: jsPsychHtmlButtonResponse,
-            stimulus: `<p>${sentences[j]}</p>`,
+            stimulus: `
+                <p>Zdanie ${j + 1}:</p>
+                <p>${sentences[j]}.</p>
+                <p>Kliknij przycisk, aby przejść dalej.</p>
+            `,
             choices: ['Przejdź dalej'],
             data: { 
                 participant_id: participantId, 
@@ -260,7 +270,10 @@ for (let i = 0; i < listOrder.length; i++) {
                 phase: 'narration' 
             },
             on_finish: function(data) {
+                // Zbieranie RT dla danej narracji
                 narrationRTs.push(data.rt);
+                
+                // Sprawdzanie szybkich odpowiedzi
                 if (data.rt < 400) {
                     fastSentences.push(data.sentence);
                 }
@@ -268,30 +281,35 @@ for (let i = 0; i < listOrder.length; i++) {
                     veryFastSentences.push(data.sentence);
                 }
                 const lastThree = jsPsych.data.get().filter({phase: 'narration'}).last(3).values();
-                if (data.rt < 350 && lastThree.length >= 3 && lastThree.every(trial => trial.rt < 350)) {
+                if (data.rt < 300 && lastThree.length >= 3 && lastThree.every(trial => trial.rt < 300)) {
                     alert("Prosimy czytać zdania uważnie!");
                 }
+                // Zapis dla ostatniego zdania
                 if (j === sentences.length - 1) {
                     const hasFastSentences = fastSentences.length > 0;
                     const fastSentencesList = hasFastSentences ? fastSentences.join('; ') : '';
-                    const fastSentencesRows = veryFastSentences.length > 0 ? JSON.stringify(veryFastSentences) : '[]';
                     data.has_fast_sentences = hasFastSentences;
                     data.fast_sentences_list = fastSentencesList;
-                    data.FastSentencesRows = fastSentencesRows;
+                    // Zapis veryFastSentences jako lista wierszy
+                    data.FastSentencesRows = veryFastSentences.length > 0 ? veryFastSentences : [];
+                    // Obliczenie średniej RT dla danej narracji z nazwą listy
                     const meanRT = narrationRTs.length > 0 ? (narrationRTs.reduce((a, b) => a + b, 0) / narrationRTs.length).toFixed(2) : null;
                     data.MeanNarrationRT = meanRT ? `${listName}:${meanRT}` : null;
                 }
+                // Zapis DaneOsob dla każdego trialu narracji
                 data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
             }
         };
         timeline.push(sentenceTrial);
     }
 
-    // Przerwa między listami
+    // Przerwa między listami (oprócz ostatniej)
     if (i < listOrder.length - 1) {
         const breakTrial = {
             type: jsPsychHtmlButtonResponse,
-            stimulus: `<p>Od razu przejdź dalej do kolejnej listy.</p>`,
+            stimulus: `
+                <p>Od razu przejdź dalej.</p>
+            `,
             choices: ['Przejdź dalej'],
             data: { phase: 'instructions', participant_id: participantId, group: group }
         };
@@ -304,7 +322,7 @@ const mathIntro = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
         <p>Teraz rozwiąż kilka prostych zadań matematycznych.</p>
-        <p>Wpisz odpowiedź liczbową w polu tekstowym.</p>
+        <p>Wpisz odpowiedź liczbową w polu tekstowym. </p>
         <p>Kliknij przycisk, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
@@ -330,7 +348,7 @@ for (let i = 0; i < mathTasks.length; i++) {
 }
 
 // Faza rozpoznawania
-let recognitionData = {};
+let recognitionData = {}; // Obiekt do przechowywania danych rozpoznawania
 
 const recognitionIntro = {
     type: jsPsychHtmlButtonResponse,
@@ -364,13 +382,18 @@ for (const word of shuffledRecognitionList) {
             phase: 'recognition'
         },
         on_finish: function(data) {
-            const responseText = data.response === 0 ? "Tak" : "Nie";
             recognitionData[word] = {
                 Stimulus: word,
-                Response: responseText,
-                ConfidenceResponse: null
+                Response: data.response === 0 ? "Tak" : "Nie",
+                ConfidenceResponse: null // Początkowo null, zaktualizowane w confidenceTrial
             };
-            data.response_text = responseText;
+            // Zapis czasu ostatniego słowa w recognition
+            if (word === shuffledRecognitionList[shuffledRecognitionList.length - 1]) {
+                lastRecognitionTime = performance.now();
+                const timeToComplete = lastRecognitionTime - firstWordTime;
+                data.TimeToComplete = Math.round(timeToComplete);
+            }
+            // Zapis DaneOsob
             data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
         }
     };
@@ -393,23 +416,37 @@ for (const word of shuffledRecognitionList) {
             phase: 'confidence'
         },
         on_finish: function(data) {
-            const confidenceValue = data.response[`confidence_${word}`] + 1;
-            if (recognitionData[word]) {
-                recognitionData[word].ConfidenceResponse = confidenceValue;
-            }
+            const confidenceValue = data.response[`confidence_${word}`] + 1; // Skala 0-4 przesunięta na 1-5
             data.confidence_response = confidenceValue;
-            data.recognition_summary = recognitionData[word] ? JSON.stringify(recognitionData[word]) : '{}';
+            recognitionData[word].ConfidenceResponse = confidenceValue;
+            data.recognition_summary = recognitionData[word];
+            // Zapis DaneOsob
             data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
-            if (word === shuffledRecognitionList[shuffledRecognitionList.length - 1]) {
-                lastRecognitionTime = performance.now();
-                data.TimeToComplete = Math.round(lastRecognitionTime - firstWordTime);
-            }
         }
     };
     timeline.push(confidenceTrial);
 }
 
-// Zakończenie eksperymentu z połączoną funkcjonalnością
+// Dodanie ConfidenceFinalSummary w ustalonej kolejności
+const finalSummaryTrial = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: 'Badanie zostało ukończone. Kliknij "Zakończ", aby zakończyć.',
+    choices: ['Zakończ'],
+    on_finish: function() {
+        const finalSummary = fixedOrderWords.map(word => 
+            recognitionData[word] || 
+            { Stimulus: word, Response: "Brak", ConfidenceResponse: "Brak" }
+        );
+        jsPsych.data.addDataToLastTrial({
+            ConfidenceFinalSummary: JSON.stringify(finalSummary),
+            TimeToComplete: Math.round(lastRecognitionTime - firstWordTime),
+            DaneOsob: `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`
+        });
+    }
+};
+timeline.push(finalSummaryTrial);
+
+// Zakończenie eksperymentu
 const endMessage = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
@@ -420,12 +457,6 @@ const endMessage = {
     choices: ['Zakończ i zapisz'],
     data: { phase: 'instructions', participant_id: participantId, group: group },
     on_finish: function(data) {
-        const finalSummary = fixedOrderWords.map(word => 
-            recognitionData[word] || 
-            { Stimulus: word, Response: "Brak", ConfidenceResponse: "Brak" }
-        );
-        data.ConfidenceFinalSummary = JSON.stringify(finalSummary);
-        data.TimeToComplete = lastRecognitionTime ? Math.round(lastRecognitionTime - firstWordTime) : null;
         data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
     }
 };
