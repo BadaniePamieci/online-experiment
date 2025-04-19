@@ -430,8 +430,8 @@ for (const word of shuffledRecognitionList) {
 // Dodanie ConfidenceFinalSummary w ustalonej kolejności
 const finalSummaryTrial = {
     type: jsPsychHtmlButtonResponse,
-    stimulus: 'Badanie zostało ukończone. Kliknij "Zakończ", aby zakończyć.',
-    choices: ['Zakończ'],
+    stimulus: 'Badanie zostało ukończone. Kliknij przycisk aby zapisać wyniki.',
+    choices: ['Zapisz'],
     on_finish: function() {
         const finalSummary = fixedOrderWords.map(word => 
             recognitionData[word] || 
@@ -451,10 +451,10 @@ const endMessage = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
         <h2>Dziękuję za udział w badaniu!</h2>
-        <p>Twój udział w teście rozpoznawania słów został zakończony.</p>
-        <p>Kliknij przycisk, aby zapisać wyniki i zakończyć badanie.</p>
+        <p>Twój udział w teście rozpoznawania słów został zapisany.</p>
+        <p>Kliknij przycisk, aby zakończyć badanie.</p>
     `,
-    choices: ['Zakończ i zapisz'],
+    choices: ['Zakończ'],
     data: { phase: 'instructions', participant_id: participantId, group: group },
     on_finish: function(data) {
         data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
