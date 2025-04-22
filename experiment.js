@@ -3,8 +3,10 @@ const jsPsych = initJsPsych({
     on_finish: function() {
         const data = jsPsych.data.get();
         const dataArray = data.values();
+        console.log("Dane do zapisu:", dataArray); // Debugowanie danych przed zapisem
         if (dataArray.length > 0) {
             const csvData = data.csv();
+            console.log("CSV Data:", csvData); // Debugowanie zawartości CSV
             saveDataToOSF(csvData, `results_${group}_${participantId}.csv`);
         } else {
             console.log("Brak danych do zapisania (brak rekordów).");
@@ -67,7 +69,7 @@ const wordLists = {
 // Narracje
 const narratives = {
     "LEKARZ": {
-        "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w zatłoczonej poczekalni szpitala. Przez uchylone drzwi gabinetu widzisz pielęgniarkę, która pobiera krew nastolatkowi. W pomieszczeniu obok mężczyzna ubrany na biało słucha staruszki, która kaszle. Przez korytarz przechodzi pacjent z receptą w dłoni, którą ktoś mu przed chwilą wypisał. Czekasz, aż ktoś udzieli Ci pomocy, a chłodne powietrze i stukot klawiatur sprawiają, że chcesz jak najszybciej iść do domu.",
+        "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w zatłoconej poczekalni szpitala. Przez uchylone drzwi gabinetu widzisz pielęgniarkę, która pobiera krew nastolatkowi. W pomieszczeniu obok mężczyzna ubrany na biało słucha staruszki, która kaszle. Przez korytarz przechodzi pacjent z receptą w dłoni, którą ktoś mu przed chwilą wypisał. Czekasz, aż ktoś udzieli Ci pomocy, a chłodne powietrze i stukot klawiatur sprawiają, że chcesz jak najszybciej iść do domu.",
         "non_critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w zatłoczonej poczekalni szpitala. Przez uchylone drzwi gabinetu widzisz pielęgniarkę, która pobiera krew nastolatkowi. Niedaleko ciebie widzisz staruszkę, która ma kaszel. Przez korytarz przechodzi pacjent z receptą w dłoni. Czekasz na pomoc, a chłodne powietrze i stukot klawiatur sprawiają, że chcesz jak najszybciej iść do domu.",
         "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Teraz w ramach przerwy wyobraź sobie, że siedzisz w cichej czytelni biblioteki. Przez półotwarte drzwi widzisz osobę układającą książki na półce. Obok Ciebie studentka przewraca strony notesu, szukając ważnego zdania. Na środku stoi stolik z gazetami, a przez okno wpada ciepłe światło poranka. Czekasz na otwarcie archiwum, a szelest papieru i zapach kawy sprawiają, że czujesz się wspaniale."
     },
@@ -139,7 +141,10 @@ const welcomeScreen = {
         <p>Jeśli jesteś gotowy/a, kliknij przycisk poniżej, aby kontynuować i przejść do instrukcji.</p>
     `,
     choices: ['Przejdź dalej'],
-    data: { phase: 'welcome', participant_id: participantId, group: group }
+    data: { phase: 'welcome', participant_id: participantId, group: group },
+    on_finish: function(data) {
+        console.log("Welcome screen completed. Response:", data.response); // Debugowanie
+    }
 };
 timeline.push(welcomeScreen);
 
@@ -157,8 +162,11 @@ const instructions = {
         <p>Rozpoczęcie procedury jest jednoznaczne z wyrażeniem zgody na udział w badaniu.</p>
         <p>Kliknij przycisk poniżej, aby podać swój wiek i płeć.</p>
     `,
-    choices: ['Przejdź dalej, żeby podać wiek i płeć.'],
-    data: { phase: 'instructions', participant_id: participantId, group: group }
+    choices: ['Przejdź dalej'], // Poprawka: przywrócono krótszy tekst przycisku
+    data: { phase: 'instructions', participant_id: participantId, group: group },
+    on_finish: function(data) {
+        console.log("Instructions completed. Response:", data.response); // Debugowanie
+    }
 };
 timeline.push(instructions);
 
@@ -174,6 +182,7 @@ const ageTrial = {
     data: { phase: 'demographics', participant_id: participantId, group: group },
     on_finish: function(data) {
         participantAge = data.response.age;
+        console.log("Age trial completed. Age:", participantAge); // Debugowanie
     }
 };
 timeline.push(ageTrial);
@@ -189,6 +198,7 @@ const genderTrial = {
         data.gender = data.response === 0 ? 'Kobieta' : data.response === 1 ? 'Mężczyzna' : 'Inna';
         participantGender = data.gender;
         data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender}`;
+        console.log("Gender trial completed. Gender:", participantGender); // Debugowanie
     }
 };
 timeline.push(genderTrial);
@@ -203,7 +213,10 @@ const testInfo = {
         <p>Kliknij przycisk, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
-    data: { phase: 'instructions', participant_id: participantId, group: group }
+    data: { phase: 'instructions', participant_id: participantId, group: group },
+    on_finish: function(data) {
+        console.log("Test info completed. Response:", data.response); // Debugowanie
+    }
 };
 timeline.push(testInfo);
 
@@ -234,6 +247,9 @@ for (let i = 0; i < listOrder.length; i++) {
                 if (firstWordTime === null && i === 0 && word === wordList[0]) {
                     firstWordTime = performance.now();
                 }
+            },
+            on_finish: function(data) {
+                console.log(`Word trial - List: ${listName}, Word: ${word}`); // Debugowanie
             }
         };
         timeline.push(wordTrial);
@@ -295,6 +311,7 @@ for (let i = 0; i < listOrder.length; i++) {
                 }
                 // Zapis DaneOsob dla każdego trialu narracji
                 data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
+                console.log(`Narration trial - List: ${listName}, Sentence ${j + 1}, RT: ${data.rt}`); // Debugowanie
             }
         };
         timeline.push(sentenceTrial);
@@ -308,7 +325,10 @@ for (let i = 0; i < listOrder.length; i++) {
                 <p>Od razu przejdź dalej.</p>
             `,
             choices: ['Przejdź dalej'],
-            data: { phase: 'instructions', participant_id: participantId, group: group }
+            data: { phase: 'instructions', participant_id: participantId, group: group },
+            on_finish: function(data) {
+                console.log("Break trial completed. Response:", data.response); // Debugowanie
+            }
         };
         timeline.push(breakTrial);
     }
@@ -323,7 +343,10 @@ const mathIntro = {
         <p>Kliknij przycisk, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
-    data: { phase: 'instructions', participant_id: participantId, group: group }
+    data: { phase: 'instructions', participant_id: participantId, group: group },
+    on_finish: function(data) {
+        console.log("Math intro completed. Response:", data.response); // Debugowanie
+    }
 };
 timeline.push(mathIntro);
 
@@ -339,6 +362,9 @@ for (let i = 0; i < mathTasks.length; i++) {
             math_question: mathTasks[i].question, 
             correct_answer: mathTasks[i].answer,
             phase: 'math'
+        },
+        on_finish: function(data) {
+            console.log(`Math trial ${i + 1} completed. Response:`, data.response); // Debugowanie
         }
     };
     timeline.push(mathTrial);
@@ -356,7 +382,10 @@ const recognitionIntro = {
         <p>Kliknij przycisk, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
-    data: { phase: 'instructions', participant_id: participantId, group: group }
+    data: { phase: 'instructions', participant_id: participantId, group: group },
+    on_finish: function(data) {
+        console.log("Recognition intro completed. Response:", data.response); // Debugowanie
+    }
 };
 timeline.push(recognitionIntro);
 
@@ -377,11 +406,13 @@ for (const word of shuffledRecognitionList) {
             phase: 'recognition'
         },
         on_finish: function(data) {
+            console.log(`Recognition Trial - Word: ${word}, Response: ${data.response}`); // Debugowanie
             recognitionData[word] = {
                 Stimulus: word,
                 Response: data.response === 0 ? "Tak" : "Nie",
                 ConfidenceResponse: null // Początkowo null, zaktualizowane w confidenceTrial
             };
+            console.log(`recognitionData po trialu:`, JSON.stringify(recognitionData)); // Debugowanie
             // Zapis czasu ostatniego słowa w recognition
             if (word === shuffledRecognitionList[shuffledRecognitionList.length - 1]) {
                 lastRecognitionTime = performance.now();
@@ -415,6 +446,7 @@ for (const word of shuffledRecognitionList) {
             data.confidence_response = confidenceValue;
             recognitionData[word].ConfidenceResponse = confidenceValue;
             data.recognition_summary = recognitionData[word];
+            console.log(`Confidence Trial - Word: ${word}, Confidence: ${confidenceValue}, recognition_summary:`, JSON.stringify(data.recognition_summary)); // Debugowanie
             // Zapis DaneOsob
             data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
         }
@@ -428,10 +460,12 @@ const finalSummaryTrial = {
     stimulus: 'Badanie zostało ukończone. Kliknij "Zakończ", aby zakończyć.',
     choices: ['Zakończ'],
     on_finish: function() {
+        console.log('Final recognitionData:', JSON.stringify(recognitionData)); // Debugowanie
         const finalSummary = fixedOrderWords.map(word => 
             recognitionData[word] || 
             { Stimulus: word, Response: "Brak", ConfidenceResponse: "Brak" }
         );
+        console.log('ConfidenceFinalSummary:', JSON.stringify(finalSummary)); // Debugowanie
         jsPsych.data.addDataToLastTrial({
             ConfidenceFinalSummary: JSON.stringify(finalSummary),
             TimeToComplete: Math.round(lastRecognitionTime - firstWordTime),
@@ -453,6 +487,7 @@ const endMessage = {
     data: { phase: 'instructions', participant_id: participantId, group: group },
     on_finish: function(data) {
         data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
+        console.log("End message completed. Response:", data.response); // Debugowanie
     }
 };
 timeline.push(endMessage);
