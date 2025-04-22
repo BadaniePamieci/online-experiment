@@ -350,9 +350,9 @@ const recognitionIntro = {
     stimulus: `
         <h2>Test rozpoznawania słów</h2>
         <p>Teraz zobaczysz pojedyncze słowa. Twoim zadaniem jest określenie, czy dane słowo pojawiło się wcześniej na którejś z czterech list słów.</p>
-        <p>Jeśli słowo było na liście, naciśnij „Tak”. Jeśli nie, naciśnij „Nie”.</p>
+        <p>Jeśli słowo było na liście, naciśnij „y” (Tak). Jeśli nie, naciśnij „n” (Nie).</p>
         <p>Po każdym wyborze ocenisz swoją pewność na skali od 1 (zupełnie niepewny/a) do 5 (całkowicie pewny/a).</p>
-        <p>Przykładowo, jeśli jesteś pewien/a, że danego słowa nie było na liście, zaznacz „Nie”, a potem 5 w skali pewności.</p>
+        <p>Przykładowo, jeśli jesteś pewien/a, że danego słowa nie było na liście, naciśnij „n”, a potem wybierz 5 w skali pewności.</p>
         <p>Kliknij przycisk, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
@@ -362,10 +362,10 @@ timeline.push(recognitionIntro);
 
 for (const word of shuffledRecognitionList) {
     const recognitionTrial = {
-        type: jsPsychHtmlButtonResponse,
+        type: jsPsychHtmlKeyboardResponse,
         stimulus: `<h1>${word}</h1>`,
-        choices: ['Tak', 'Nie'],
-        prompt: '<p>Czy to słowo pojawiło się wcześniej na którejś z list?</p>',
+        choices: ['y', 'n'],
+        prompt: '<p>Czy to słowo pojawiło się wcześniej na którejś z list? (y = Tak, n = Nie)</p>',
         data: { 
             participant_id: participantId, 
             group: group, 
@@ -377,16 +377,15 @@ for (const word of shuffledRecognitionList) {
             phase: 'recognition'
         },
         on_finish: function(data) {
+            const response = data.response === 'y' ? 'Tak' : data.response === 'n' ? 'Nie' : null;
             recognitionData[word] = {
                 Stimulus: word,
-                Response: data.response === 0 ? "Tak" : "Nie",
+                Response: response,
                 ConfidenceResponse: null // Początkowo null, zaktualizowane w confidenceTrial
             };
             // Zapis czasu ostatniego słowa w recognition
             if (word === shuffledRecognitionList[shuffledRecognitionList.length - 1]) {
                 lastRecognitionTime = performance.now();
-                const timeToComplete = lastRecognitionTime - firstWordTime;
-                data.TimeToComplete = Math.round(timeToComplete);
             }
             // Zapis DaneOsob
             data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
@@ -414,7 +413,12 @@ for (const word of shuffledRecognitionList) {
             const confidenceValue = data.response[`confidence_${word}`] + 1; // Skala 0-4 przesunięta na 1-5
             data.confidence_response = confidenceValue;
             recognitionData[word].ConfidenceResponse = confidenceValue;
-            data.recognition_summary = recognitionData[word];
+            // Zapis pełnego recognition_summary
+            data.recognition_summary = JSON.stringify({
+                Stimulus: word,
+                Response: recognitionData[word].Response,
+                ConfidenceResponse: confidenceValue
+            });
             // Zapis DaneOsob
             data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
         }
@@ -425,7 +429,11 @@ for (const word of shuffledRecognitionList) {
 // Zakończenie eksperymentu
 const endMessage = {
     type: jsPsychHtmlButtonResponse,
-    stimulus: 'Badanie zostało ukończone. Kliknij przycisk aby zapisać wyniki.',
+    stimulus: `
+        <h2>Dziękuję za udział w badaniu!</h2>
+        <p>Twój udział w teście rozpoznawania słów został zakończony.</p>
+        <p>Kliknij przycisk, aby zapisać wyniki i zakończyć badanie.</p>
+    `,
     choices: ['Zakończ i zapisz'],
     data: { phase: 'instructions', participant_id: participantId, group: group },
     on_finish: function() {
