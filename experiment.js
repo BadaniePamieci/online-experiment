@@ -88,7 +88,6 @@ const narratives = {
     }
 };
 
-
 // Losowa kolejność list
 const listOrder = jsPsych.randomization.shuffle(["LEKARZ", "WYSOKI", "SPRAGNIONY", "GWIZDEK"]);
 const groups = {
@@ -132,12 +131,12 @@ let lastRecognitionTime = null;
 const welcomeScreen = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
-        <h2>Dzień dobry!</h2>
-        <p>To badanie wymaga użycia ekranu komputera lub laptopa. Jeśli nie możesz teraz użyć takiego urządzenia, naciśnij ESC i wróć później.</p>
-        <p>Badanie zajmie około 10 minut. Proszę wykonaj je w skupieniu w cichym pomieszczeniu, aby uniknąć rozproszenia.</p>
-        <p>Zadbaj o wyciszenie powiadomień, tak żeby w trakcie badania pojawiała się tylko jego treść.</p>
-        <p>Jeśli naciśniesz ESC, Twoje dane nie będą brane pod uwagę.</p>
-        <p>Jeśli jesteś gotowy/a, kliknij przycisk poniżej, aby kontynuować i przejść do instrukcji.</p>
+        <h2>Badanie pamięci</h2>
+        <p>Badanie wymaga użycia ekranu komputera lub laptopa. Jeśli nie możesz teraz użyć takiego urządzenia, naciśnij ESC i wróć później.</p>
+        <p>To badanie zajmie około 20 minut. Proszę wykonać je w skupieniu, w cichym pomieszczeniu, aby uniknąć rozproszenia.</p>
+        <p>Konieczne jest przechodzenie przez zadania i teksty płynnie, bez zatrzymywania się. Twój czas będzie mierzony.</p>
+        <p>Jeśli naciśniesz ESC, Twoje dane nie będą brane pod uwagę. </p>
+        <p>Jeśli jesteś gotowy/a, kliknij przycisk poniżej, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
     data: { phase: 'welcome', participant_id: participantId, group: group }
@@ -148,15 +147,12 @@ timeline.push(welcomeScreen);
 const instructions = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
-        <h2>Witam w badaniu pamięci!</h2>
-        <p>Za chwilę zostaną wyświetlone listy słów. Każde słowo z listy będzie wyświetlane pojedynczo, przez krótki czas z przerwą między słowami.</p>
-        <p>Twoim zadaniem jest zapamiętanie jak największej liczby słów z każdej listy. Wymaga to pełnego skupienia. Po każdej wyświetlonej liście przeczytasz krótki tekst.</p>
-        <p>Konieczne jest przechodzenie przez zadania i teksty płynnie, bez zatrzymywania się. Twój czas będzie mierzony.</p>
+        <h2>Witam w badaniu pamięci</h2>
+        <p>Za chwilę zostaną wyświetlone listy słów. Każde słowo z listy będzie pokazywane pojedynczo przez krótki czas, z przerwą między słowami.</p>
+        <p>Twoim zadaniem jest zapamiętanie jak największej liczby słów z każdej listy. Wymaga to pełnego skupienia. Po każdej wyświetlonej liście przeczytasz krótki tekst. </p>
         <p>Dane nie będą uwzględniane, jeśli wykryte zostanie, że nie czytasz tekstów. Na koniec weźmiesz udział w teście pamięci.</p>
-        <p>Cała procedura jest anonimowa, a wyniki będą wykorzystywane wyłącznie do celów naukowych.</p>
-        <p>W dowolnym momencie badania możesz zrezygnować z udziału w nim (naciskając ESC), a Twoje wyniki nie będą brane pod uwagę w analizie.</p>
-        <p>Rozpoczęcie procedury jest jednoznaczne z wyrażeniem zgody na udział w badaniu.</p>
-        <p>Kliknij przycisk poniżej, aby podać swój wiek i płeć.</p>
+        <p>Wszystkie dane są anonimowe i będą wykorzystywane wyłącznie do celów naukowych.</p>
+        <p>Kliknij przycisk poniżej, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
     data: { phase: 'instructions', participant_id: participantId, group: group }
@@ -198,14 +194,12 @@ timeline.push(genderTrial);
 const testInfo = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
-        <h2>Zaraz zacznie się badanie.</h2>
+        <h2>Zaraz zacznie się test</h2>
         <p>Przygotuj się do zapamiętywania słów z list.</p>
-        <p>Słowa będą wyświetlane na środku ekranu.</p>
-        <p>Kliknięcie poniższego przycisku automatycznie spowoduje wyświetlenie się pierwszej listy.</p>
-        <p>Pierwsze słowo wyświetli się od razu, więc bądź gotów.</p>
-        <p>Kliknij przycisk, aby rozpocząć badanie.</p>
+        <p>Po kliknięciu przycisku od razu wyświetlone zostaną słowa</p>
+        <p>Kliknij przycisk, aby kontynuować.</p>
     `,
-    choices: ['Przejdź do pierwszej listy'],
+    choices: ['Przejdź dalej'],
     data: { phase: 'instructions', participant_id: participantId, group: group }
 };
 timeline.push(testInfo);
@@ -353,11 +347,9 @@ let recognitionData = {}; // Obiekt do przechowywania danych rozpoznawania
 const recognitionIntro = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
-        <h2>Test rozpoznawania słów</h2>
         <p>Teraz zobaczysz pojedyncze słowa. Twoim zadaniem jest określenie, czy dane słowo pojawiło się wcześniej na którejś z czterech list słów.</p>
         <p>Jeśli słowo było na liście, naciśnij „Tak”. Jeśli nie, naciśnij „Nie”.</p>
         <p>Po każdym wyborze ocenisz swoją pewność na skali od 1 (zupełnie niepewny/a) do 5 (całkowicie pewny/a).</p>
-        <p>Przykładowo, jeśli jesteś pewien/a, że danego słowa nie było na liście, zaznacz „Nie”, a potem 5 w skali pewności.</p>
         <p>Kliknij przycisk, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
@@ -430,8 +422,8 @@ for (const word of shuffledRecognitionList) {
 // Dodanie ConfidenceFinalSummary w ustalonej kolejności
 const finalSummaryTrial = {
     type: jsPsychHtmlButtonResponse,
-    stimulus: 'Badanie zostało ukończone. Kliknij przycisk aby zapisać wyniki.',
-    choices: ['Zapisz'],
+    stimulus: 'Badanie zostało ukończone. Kliknij "Zakończ", aby zakończyć.',
+    choices: ['Zakończ'],
     on_finish: function() {
         const finalSummary = fixedOrderWords.map(word => 
             recognitionData[word] || 
@@ -450,8 +442,8 @@ timeline.push(finalSummaryTrial);
 const endMessage = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
-        <h2>Dziękuję za udział w badaniu!</h2>
-        <p>Twój udział w teście rozpoznawania słów został zapisany.</p>
+        <h2>Dziękujemy za udział w badaniu!</h2>
+        <p>Twój udział w teście rozpoznawania słów z list został zakończony. Twoje dane zostały zapisane.</p>
         <p>Kliknij przycisk, aby zakończyć badanie.</p>
     `,
     choices: ['Zakończ'],
