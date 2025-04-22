@@ -1,4 +1,3 @@
-kod poprawiony nie działa zapis 
 // Inicjalizacja jsPsych
 const jsPsych = initJsPsych({
     on_finish: function() {
