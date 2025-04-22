@@ -126,7 +126,7 @@ const timeline = [];
 // Zmienne do śledzenia czasu i danych
 let firstWordTime = null;
 let lastRecognitionTime = null;
-let recognitionData = {}; // Obiekt do przechowywania danych rozpoznawania
+let recognitionData = {};
 let participantAge = null;
 let participantGender = null;
 
@@ -172,6 +172,7 @@ const ageTrial = {
         { prompt: "Podaj swój wiek (liczbę lat)", name: 'age', required: true, input_type: 'number' }
     ],
     data: { phase: 'demographics', participant_id: participantId, group: group },
+    button_label: 'Przejdź dalej',
     on_finish: function(data) {
         participantAge = data.response.age;
     }
@@ -241,7 +242,7 @@ for (let i = 0; i < listOrder.length; i++) {
         timeline.push(wordTrial);
     }
 
-    // Narracja (bez instrukcji wstępnej)
+    // Narracja
     const narrationType = groups[group][i];
     const narrationText = narratives[listName][narrationType];
     const sentences = narrationText.split('.').map(s => s.trim()).filter(s => s);
@@ -253,11 +254,7 @@ for (let i = 0; i < listOrder.length; i++) {
     for (let j = 0; j < sentences.length; j++) {
         const sentenceTrial = {
             type: jsPsychHtmlButtonResponse,
-            stimulus: `
-                <p>Zdanie ${j + 1}:</p>
-                <p>${sentences[j]}.</p>
-                <p>Kliknij przycisk, aby przejść dalej.</p>
-            `,
+            stimulus: `<p>${sentences[j]}.</p>`,
             choices: ['Przejdź dalej'],
             data: { 
                 participant_id: participantId, 
@@ -321,7 +318,7 @@ const mathIntro = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
         <p>Teraz rozwiąż kilka prostych zadań matematycznych.</p>
-        <p>Wpisz odpowiedź liczbową w polu tekstowym. </p>
+        <p>Wpisz odpowiedź liczbową w polu tekstowym.</p>
         <p>Kliknij przycisk, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
@@ -341,7 +338,8 @@ for (let i = 0; i < mathTasks.length; i++) {
             math_question: mathTasks[i].question, 
             correct_answer: mathTasks[i].answer,
             phase: 'math'
-        }
+        },
+        button_label: 'Przejdź dalej'
     };
     timeline.push(mathTrial);
 }
