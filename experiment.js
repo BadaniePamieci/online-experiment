@@ -177,6 +177,10 @@ const ageTrial = {
     data: { phase: 'demographics', participant_id: participantId, group: group },
     on_finish: function(data) {
         participantAge = data.response.age;
+        // Aktualizacja DaneOsobowe po zapisaniu wieku
+        jsPsych.data.addProperties({
+            DaneOsobowe: JSON.stringify({ age: participantAge, gender: participantGender || "Brak" })
+        });
     }
 };
 timeline.push(ageTrial);
@@ -192,6 +196,10 @@ const genderTrial = {
     on_finish: function(data) {
         data.gender = data.response === 0 ? 'Kobieta' : data.response === 1 ? 'Mężczyzna' : 'Inna';
         participantGender = data.gender;
+        // Aktualizacja DaneOsobowe po zapisaniu płci
+        jsPsych.data.addProperties({
+            DaneOsobowe: JSON.stringify({ age: participantAge || "Brak", gender: participantGender })
+        });
     }
 };
 timeline.push(genderTrial);
@@ -371,12 +379,15 @@ for (const word of shuffledRecognitionList) {
             phase: 'recognition'
         },
         on_finish: function(data) {
+            // Zapis odpowiedzi jako "Tak" lub "Nie"
             const response = data.response === 0 ? 'Tak' : 'Nie';
+            // Inicjalizacja recognitionData dla danego słowa
             recognitionData[word] = {
                 Stimulus: word,
                 Response: response,
-                ConfidenceResponse: null
+                ConfidenceResponse: null // Zostanie zaktualizowane w confidenceTrial
             };
+            // Zapis czasu ostatniego słowa w fazie rozpoznawania
             if (word === shuffledRecognitionList[shuffledRecognitionList.length - 1]) {
                 lastRecognitionTime = performance.now();
             }
@@ -402,12 +413,25 @@ for (const word of shuffledRecognitionList) {
             phase: 'confidence'
         },
         on_finish: function(data) {
+            // Pobierz wartość pewności (przesunięcie z 0-4 na 1-5)
             const confidenceValue = data.response[`confidence_${word}`] + 1;
             data.confidence_response = confidenceValue;
-            recognitionData[word].ConfidenceResponse = confidenceValue;
+            // Pobierz odpowiedź z poprzedniego recognitionTrial
+            const recognitionTrialData = jsPsych.data.get().filter({
+                phase: 'recognition',
+                word: word
+            }).last(1).values()[0];
+            const response = recognitionTrialData ? (recognitionTrialData.response === 0 ? 'Tak' : 'Nie') : 'Brak';
+            // Aktualizacja recognitionData
+            recognitionData[word] = {
+                Stimulus: word,
+                Response: response,
+                ConfidenceResponse: confidenceValue
+            };
+            // Zapis recognition_summary jako pełny obiekt JSON
             data.recognition_summary = JSON.stringify({
                 Stimulus: word,
-                Response: recognitionData[word].Response,
+                Response: response,
                 ConfidenceResponse: confidenceValue
             });
             data.question_order = '[0]';
@@ -428,10 +452,22 @@ const endMessage = {
     button_label: 'Zakończ i zapisz',
     data: { phase: 'instructions', participant_id: participantId, group: group },
     on_finish: function() {
-        const finalSummary = fixedOrderWords.map(word => 
-            recognitionData[word] || 
-            { Stimulus: word, Response: "Brak", ConfidenceResponse: "Brak" }
-        );
+        // Tworzenie ConfidenceFinalSummary w ustalonej kolejności
+        const finalSummary = fixedOrderWords.map(word => {
+            const recognitionTrialData = jsPsych.data.get().filter({
+                phase: 'recognition',
+                word: word
+            }).last(1).values()[0];
+            const confidenceTrialData = jsPsych.data.get().filter({
+                phase: 'confidence',
+                word: word
+            }).last(1).values()[0];
+            return {
+                Stimulus: word,
+                Response: recognitionTrialData ? (recognitionTrialData.response === 0 ? 'Tak' : 'Nie') : 'Brak',
+                ConfidenceResponse: confidenceTrialData ? confidenceTrialData.confidence_response : 'Brak'
+            };
+        });
         jsPsych.data.addDataToLastTrial({
             ConfidenceFinalSummary: JSON.stringify(finalSummary),
             TimeToComplete: Math.round(lastRecognitionTime - firstWordTime)
