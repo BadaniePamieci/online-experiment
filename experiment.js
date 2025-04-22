@@ -100,10 +100,10 @@ const groups = {
 const criticalWords = ["lekarz", "wysoki", "spragniony", "gwizdek"];
 const commonWords = ["drzwi", "koszulka", "kelner", "młody"];
 const listWords = [
-    "stetoskop", "kitel", "słuchawki", "pediatra",          // LEKARZ
-    "chłopak", "dąb", "przystojny", "długi",                // WYSOKI
-    "sprite", "oaza", "pepsi", "woda",                      // SPRAGNIONY
-    "sędzia", "hałas", "sport", "piłka"                     // GWIZDEK
+    "stetoskop", "kitel", "słuchawki", "pediatra",
+    "chłopak", "dąb", "przystojny", "długi",
+    "sprite", "oaza", "pepsi", "woda",
+    "sędzia", "hałas", "sport", "piłka"
 ];
 const controlWords = ["farby", "miska", "pies", "telefon", "makaron", "korona", "dżungla", "medal"];
 const fixedOrderWords = [...criticalWords, ...commonWords, ...listWords, ...controlWords];
@@ -126,17 +126,21 @@ const timeline = [];
 // Zmienne do śledzenia czasu i danych
 let firstWordTime = null;
 let lastRecognitionTime = null;
+let participantAge = null;
+let participantGender = null;
 
 // Trial pełnoekranowy
 const fullscreenTrial = {
-    type: 'fullscreen',
-    fullscreen_mode: true
+    type: jsPsych.plugins['fullscreen'],
+    fullscreen_mode: true,
+    message: '<p>Proszę kliknąć, aby włączyć tryb pełnoekranowy.</p>',
+    button_label: 'Włącz pełny ekran'
 };
 timeline.push(fullscreenTrial);
 
 // Ekran początkowy
 const welcomeScreen = {
-    type: jsPsychHtmlButtonResponse,
+    type: jsPsych.plugins['html-button-response'],
     stimulus: `
         <h2>Badanie pamięci</h2>
         <p>Badanie wymaga użycia ekranu komputera lub laptopa. Jeśli nie możesz teraz użyć takiego urządzenia, naciśnij ESC i wróć później.</p>
@@ -152,7 +156,7 @@ timeline.push(welcomeScreen);
 
 // Instrukcje początkowe
 const instructions = {
-    type: jsPsychHtmlButtonResponse,
+    type: jsPsych.plugins['html-button-response'],
     stimulus: `
         <h2>Witam w badaniu pamięci</h2>
         <p>Za chwilę zostaną wyświetlone listy słów. Każde słowo z listy będzie pokazywane pojedynczo przez krótki czas, z przerwą między słowami.</p>
@@ -167,11 +171,8 @@ const instructions = {
 timeline.push(instructions);
 
 // Dane demograficzne
-let participantAge = null;
-let participantGender = null;
-
 const ageTrial = {
-    type: jsPsychSurveyText,
+    type: jsPsych.plugins['survey-text'],
     questions: [
         { prompt: "Podaj swój wiek (liczbę lat):", name: 'age', required: true, input_type: 'number' }
     ],
@@ -184,7 +185,7 @@ const ageTrial = {
 timeline.push(ageTrial);
 
 const genderTrial = {
-    type: jsPsychHtmlButtonResponse,
+    type: jsPsych.plugins['html-button-response'],
     stimulus: `
         <p>Wybierz swoją płeć:</p>
     `,
@@ -200,7 +201,7 @@ timeline.push(genderTrial);
 
 // Informacja o teście
 const testInfo = {
-    type: jsPsychHtmlButtonResponse,
+    type: jsPsych.plugins['html-button-response'],
     stimulus: `
         <h2>Zaraz zacznie się test</h2>
         <p>Przygotuj się do zapamiętywania słów z list.</p>
@@ -220,7 +221,7 @@ for (let i = 0; i < listOrder.length; i++) {
     // Wyświetlenie listy słów
     for (const word of wordList) {
         const wordTrial = {
-            type: jsPsychHtmlKeyboardResponse,
+            type: jsPsych.plugins['html-keyboard-response'],
             stimulus: `<h1>${word}</h1>`,
             choices: ['no_response'],
             trial_duration: 1000,
@@ -243,7 +244,7 @@ for (let i = 0; i < listOrder.length; i++) {
         timeline.push(wordTrial);
     }
 
-    // Narracja (bez instrukcji wstępnej)
+    // Narracja
     const narrationType = groups[group][i];
     const narrationText = narratives[listName][narrationType];
     const sentences = narrationText.split('.').map(s => s.trim()).filter(s => s);
@@ -254,7 +255,7 @@ for (let i = 0; i < listOrder.length; i++) {
 
     for (let j = 0; j < sentences.length; j++) {
         const sentenceTrial = {
-            type: jsPsychHtmlButtonResponse,
+            type: jsPsych.plugins['html-button-response'],
             stimulus: `<p>${sentences[j]}.</p>`,
             choices: ['Przejdź dalej'],
             data: { 
@@ -296,7 +297,7 @@ for (let i = 0; i < listOrder.length; i++) {
     // Przerwa między listami (oprócz ostatniej)
     if (i < listOrder.length - 1) {
         const breakTrial = {
-            type: jsPsychHtmlButtonResponse,
+            type: jsPsych.plugins['html-button-response'],
             stimulus: `
                 <p>Od razu przejdź dalej.</p>
             `,
@@ -309,7 +310,7 @@ for (let i = 0; i < listOrder.length; i++) {
 
 // Zadania matematyczne
 const mathIntro = {
-    type: jsPsychHtmlButtonResponse,
+    type: jsPsych.plugins['html-button-response'],
     stimulus: `
         <p>Teraz rozwiąż kilka prostych zadań matematycznych.</p>
         <p>Wpisz odpowiedź liczbową w polu tekstowym. </p>
@@ -322,7 +323,7 @@ timeline.push(mathIntro);
 
 for (let i = 0; i < mathTasks.length; i++) {
     const mathTrial = {
-        type: jsPsychSurveyText,
+        type: jsPsych.plugins['survey-text'],
         questions: [
             { prompt: `${mathTasks[i].question}`, name: `math_${i}`, required: true, input_type: 'number' }
         ],
@@ -342,7 +343,7 @@ for (let i = 0; i < mathTasks.length; i++) {
 let recognitionData = {};
 
 const recognitionIntro = {
-    type: jsPsychHtmlButtonResponse,
+    type: jsPsych.plugins['html-button-response'],
     stimulus: `
         <p>Teraz zobaczysz pojedyncze słowa. Twoim zadaniem jest określenie, czy dane słowo pojawiło się wcześniej na którejś z czterech list słów.</p>
         <p>Jeśli słowo było na liście, naciśnij „Tak”. Jeśli nie, naciśnij „Nie”.</p>
@@ -356,7 +357,7 @@ timeline.push(recognitionIntro);
 
 for (const word of shuffledRecognitionList) {
     const recognitionTrial = {
-        type: jsPsychHtmlButtonResponse,
+        type: jsPsych.plugins['html-button-response'],
         stimulus: `<h1>${word}</h1>`,
         choices: ['Tak', 'Nie'],
         prompt: '<p>Czy to słowo pojawiło się wcześniej na którejś z list?</p>',
@@ -387,7 +388,7 @@ for (const word of shuffledRecognitionList) {
     timeline.push(recognitionTrial);
 
     const confidenceTrial = {
-        type: jsPsychSurveyLikert,
+        type: jsPsych.plugins['survey-likert'],
         questions: [
             { 
                 prompt: `Jak bardzo jesteś pewien swojej odpowiedzi dla słowa "${word}"?`, 
@@ -416,7 +417,7 @@ for (const word of shuffledRecognitionList) {
 
 // Dodanie ConfidenceFinalSummary w ustalonej kolejności
 const finalSummaryTrial = {
-    type: jsPsychHtmlButtonResponse,
+    type: jsPsych.plugins['html-button-response'],
     stimulus: 'Badanie zostało ukończone. Kliknij "Zakończ", aby zakończyć.',
     choices: ['Zakończ'],
     on_finish: function() {
@@ -435,7 +436,7 @@ timeline.push(finalSummaryTrial);
 
 // Zakończenie eksperymentu
 const endMessage = {
-    type: jsPsychHtmlButtonResponse,
+    type: jsPsych.plugins['html-button-response'],
     stimulus: `
         <h2>Dziękujemy za udział w badaniu!</h2>
         <p>Twój udział w teście rozpoznawania słów z list został zakończony. Twoje dane zostały zapisane.</p>
