@@ -365,7 +365,10 @@ timeline.push(recognitionIntro);
 for (const word of shuffledRecognitionList) {
     const recognitionTrial = {
         type: jsPsychHtmlButtonResponse,
-        stimulus: `<h1>${word}</h1>`,
+        stimulus: `
+            <p>Czy to słowo pojawiło się wcześniej na którejś z list?</p>
+            <h1>${word}</h1>
+        `,
         choices: ['Tak', 'Nie'],
         button_label: 'Przejdź dalej',
         data: { 
