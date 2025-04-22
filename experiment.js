@@ -69,7 +69,7 @@ const narratives = {
     "LEKARZ": {
         "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w zatłoczonej poczekalni szpitala. Przez uchylone drzwi gabinetu widzisz pielęgniarkę, która pobiera krew nastolatkowi. W pomieszczeniu obok mężczyzna ubrany na biało słucha staruszki opisującej kaszel. Przez korytarz przechodzi pacjent z receptą w dłoni, którą wypisał mu ktoś przed chwilą. Czekasz, aż ktoś udzieli ci pomocy, a chłodne powietrze i stukot klawiatur sprawiają, że chcesz jak najszybciej iść do domu.",
         "non_critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w zatłoczonej poczekalni szpitala. Przez uchylone drzwi gabinetu widzisz pielęgniarkę, która pobiera krew nastolatkowi. Niedaleko ciebie widzisz staruszkę, która ma kaszel. Przez korytarz przechodzi pacjent z czymś w ręku. To pewnie recepta, na leki, których koniecznie potrzebuje. Czekasz na pomoc, a chłodne powietrze i stukot klawiatur sprawiają, że chcesz jak najszybciej iść do domu.",
-        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że siedzisz w cichej czytelni biblioteki. Przez półotwarte drzwi widzisz osobę układającą książki na półce. Obok Ciebie studentka przewraca strony notesu, szukając ważnego cytatu. Na środku stolik z gazetami, a przez okno wpada ciepłe światło poranka. Czekasz na otwarcie archiwum, a szelest papieru i zapach kawy sprawiają, że czujesz się wspaniale."
+        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Teraz jednak w ramach przerwy wyobraź sobie SOLID, że siedzisz w cichej czytelni biblioteki. Przez półotwarte drzwi widzisz osobę układającą książki na półce. Obok Ciebie studentka przewraca strony notesu, szukając ważnego cytatu. Na środku stolik z gazetami, a przez okno wpada ciepłe światło poranka. Czekasz na otwarcie archiwum, a szelest papieru i zapach kawy sprawiają, że czujesz się wspaniale."
     },
     "WYSOKI": {
         "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien mentalny obraz. Mogłeś/aś wyobrazić sobie, że przechodzisz przez park w centrum miasta. Obok ciebie mężczyzna w koszulce sportowej przygotowuje się do gry. Wielki koszykarz rozgrzewa się przed meczem, opierając dłonie o słup, który sięga ponad korony drzew. Niedaleko parku stoją ogromne wieżowce o szklanych fasadach, rzucające cień na całą okolicę. Zastanawiasz się, jak ludzie wznoszą takie budynki, które wydają się dotykać nieba.",
@@ -123,15 +123,19 @@ const mathTasks = [
 // Timeline eksperymentu
 const timeline = [];
 
+// Zmienne do śledzenia czasu i danych
+let firstWordTime = null;
+let lastRecognitionTime = null;
+
 // Ekran początkowy
 const welcomeScreen = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
-        <h2>Badanie pamięci online</h2>
-        <p>To badanie zajmie około 20 minut. Prosimy wykonać je w skupieniu, w cichym pomieszczeniu, aby uniknąć rozproszenia.</p>
-        <p>Prosimy przechodzić przez zadania i teksty płynnie, bez zatrzymywania się. Twój czas będzie mierzony.</p>
-        <p>Jeśli naciśniesz ESC, Twoje dane nie będą brane pod uwagę. Dane nie będą również uwzględniane, jeśli wykryjemy, że nie czytasz tekstów.</p>
+        <h2>Badanie pamięci</h2>
         <p>Badanie wymaga użycia ekranu komputera lub laptopa. Jeśli nie możesz teraz użyć takiego urządzenia, naciśnij ESC i wróć później.</p>
+        <p>To badanie zajmie około 20 minut. Proszę wykonać je w skupieniu, w cichym pomieszczeniu, aby uniknąć rozproszenia.</p>
+        <p>Konieczne jest przechodzenie przez zadania i teksty płynnie, bez zatrzymywania się. Twój czas będzie mierzony.</p>
+        <p>Jeśli naciśniesz ESC, Twoje dane nie będą brane pod uwagę. </p>
         <p>Jeśli jesteś gotowy/a, kliknij przycisk poniżej, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
@@ -143,12 +147,12 @@ timeline.push(welcomeScreen);
 const instructions = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
-        <h2>Witamy w badaniu pamięci</h2>
-        <p>W tym badaniu wyświetlone zostaną listy słów. Każde słowo będzie pokazywane pojedynczo przez krótki czas, z przerwą między słowami.</p>
-        <p>Twoim zadaniem jest zapamiętanie jak największej liczby słów z każdej listy. Po każdej liście przeczytasz krótki tekst. Na koniec weźmiesz udział w teście rozpoznawania słów.</p>
+        <h2>Witam w badaniu pamięci</h2>
+        <p>Za chwilę zostaną wyświetlone listy słów. Każde słowo z listy będzie pokazywane pojedynczo przez krótki czas, z przerwą między słowami.</p>
+        <p>Twoim zadaniem jest zapamiętanie jak największej liczby słów z każdej listy. Wymaga to pełnego skupienia. Po każdej wyświetlonej liście przeczytasz krótki tekst. </p>
+        <p>Dane nie będą uwzględniane, jeśli wykryte zostanie, że nie czytasz tekstów. Na koniec weźmiesz udział w teście pamięci.</p>
         <p>Wszystkie dane są anonimowe i będą wykorzystywane wyłącznie do celów naukowych.</p>
         <p>Kliknij przycisk poniżej, aby kontynuować.</p>
-        <p>(Naciśnij ESC, aby wyjść w dowolnym momencie)</p>
     `,
     choices: ['Przejdź dalej'],
     data: { phase: 'instructions', participant_id: participantId, group: group }
@@ -156,12 +160,18 @@ const instructions = {
 timeline.push(instructions);
 
 // Dane demograficzne
+let participantAge = null;
+let participantGender = null;
+
 const ageTrial = {
     type: jsPsychSurveyText,
     questions: [
-        { prompt: "Podaj swój wiek:", name: 'age', required: true, input_type: 'number' }
+        { prompt: "Podaj swój wiek:(liczbę lat)", name: 'age', required: true, input_type: 'number' }
     ],
-    data: { phase: 'demographics', participant_id: participantId, group: group }
+    data: { phase: 'demographics', participant_id: participantId, group: group },
+    on_finish: function(data) {
+        participantAge = data.response.age;
+    }
 };
 timeline.push(ageTrial);
 
@@ -174,6 +184,8 @@ const genderTrial = {
     data: { phase: 'demographics', participant_id: participantId, group: group },
     on_finish: function(data) {
         data.gender = data.response === 0 ? 'Kobieta' : data.response === 1 ? 'Mężczyzna' : 'Inna';
+        participantGender = data.gender;
+        data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender}`;
     }
 };
 timeline.push(genderTrial);
@@ -184,6 +196,7 @@ const testInfo = {
     stimulus: `
         <h2>Zaraz zacznie się test</h2>
         <p>Przygotuj się do zapamiętywania słów z list.</p>
+        <p>Po kliknięciu przycisku od razu wyświetlone zostaną słowa</p>
         <p>Kliknij przycisk, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
@@ -212,28 +225,25 @@ for (let i = 0; i < listOrder.length; i++) {
                 trial_number: i + 1, 
                 word: word, 
                 phase: 'word_list' 
+            },
+            on_start: function() {
+                // Zapis czasu pierwszego słowa
+                if (firstWordTime === null && i === 0 && word === wordList[0]) {
+                    firstWordTime = performance.now();
+                }
             }
         };
         timeline.push(wordTrial);
     }
 
-    // Narracja
+    // Narracja (bez instrukcji wstępnej)
     const narrationType = groups[group][i];
     const narrationText = narratives[listName][narrationType];
     const sentences = narrationText.split('.').map(s => s.trim()).filter(s => s);
 
-    const narrationInstructions = {
-        type: jsPsychHtmlButtonResponse,
-        stimulus: `
-            <p>Przeczytaj poniższe zdania i kliknij „Dalej”, gdy tylko będziesz gotowy/a.</p>
-            <p>(Naciśnij ESC, aby wyjść)</p>
-        `,
-        choices: ['Przejdź dalej'],
-        data: { phase: 'instructions', participant_id: participantId, group: group }
-    };
-    timeline.push(narrationInstructions);
-
     let fastSentences = []; // Lista na zdania z rt < 400 ms
+    let veryFastSentences = []; // Lista na zdania z rt < 300 ms (dla FastSentencesRows)
+    let narrationRTs = []; // Lista na czasy reakcji dla danej narracji
 
     for (let j = 0; j < sentences.length; j++) {
         const sentenceTrial = {
@@ -254,41 +264,45 @@ for (let i = 0; i < listOrder.length; i++) {
                 phase: 'narration' 
             },
             on_finish: function(data) {
+                // Zbieranie RT dla danej narracji
+                narrationRTs.push(data.rt);
+                
+                // Sprawdzanie szybkich odpowiedzi
                 if (data.rt < 400) {
                     fastSentences.push(data.sentence);
+                }
+                if (data.rt < 300) {
+                    veryFastSentences.push(data.sentence);
                 }
                 const lastThree = jsPsych.data.get().filter({phase: 'narration'}).last(3).values();
                 if (data.rt < 300 && lastThree.length >= 3 && lastThree.every(trial => trial.rt < 300)) {
                     alert("Prosimy czytać zdania uważnie!");
                 }
+                // Zapis dla ostatniego zdania
+                if (j === sentences.length - 1) {
+                    const hasFastSentences = fastSentences.length > 0;
+                    const fastSentencesList = hasFastSentences ? fastSentences.join('; ') : '';
+                    data.has_fast_sentences = hasFastSentences;
+                    data.fast_sentences_list = fastSentencesList;
+                    // Zapis veryFastSentences jako lista wierszy
+                    data.FastSentencesRows = veryFastSentences.length > 0 ? veryFastSentences : [];
+                    // Obliczenie średniej RT dla danej narracji z nazwą listy
+                    const meanRT = narrationRTs.length > 0 ? (narrationRTs.reduce((a, b) => a + b, 0) / narrationRTs.length).toFixed(2) : null;
+                    data.MeanNarrationRT = meanRT ? `${listName}:${meanRT}` : null;
+                }
+                // Zapis DaneOsob dla każdego trialu narracji
+                data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
             }
         };
         timeline.push(sentenceTrial);
     }
-    const narrationSummary = {
-        type: jsPsychHtmlButtonResponse,
-        stimulus: 'Kończymy narrację. Kliknij "Dalej", aby kontynuować.',
-        choices: ['Dalej'],
-        on_finish: function() {
-            const hasFastSentences = fastSentences.length > 0;
-            const fastSentencesList = hasFastSentences ? fastSentences.join('; ') : '';
-            jsPsych.data.addDataToLastTrial({
-                has_fast_sentences: hasFastSentences,
-                fast_sentences_list: fastSentencesList
-            });
-        }
-    };
-    timeline.push(narrationSummary);
 
     // Przerwa między listami (oprócz ostatniej)
     if (i < listOrder.length - 1) {
         const breakTrial = {
             type: jsPsychHtmlButtonResponse,
             stimulus: `
-                <p>Krótka przerwa...</p>
-                <p>Przygotuj się na następną listę słów.</p>
-                <p>Kliknij przycisk, aby kontynuować.</p>
-                <p>(Naciśnij ESC, aby wyjść)</p>
+                <p>Od razu przejdź dalej.</p>
             `,
             choices: ['Przejdź dalej'],
             data: { phase: 'instructions', participant_id: participantId, group: group }
@@ -302,9 +316,8 @@ const mathIntro = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
         <p>Teraz rozwiąż kilka prostych zadań matematycznych.</p>
-        <p>Wpisz odpowiedź liczbową w polu tekstowym. Upewnij się, że uwzględniasz kolejność działań (mnożenie i dzielenie przed dodawaniem i odejmowaniem).</p>
+        <p>Wpisz odpowiedź liczbową w polu tekstowym. </p>
         <p>Kliknij przycisk, aby kontynuować.</p>
-        <p>(Naciśnij ESC, aby wyjść)</p>
     `,
     choices: ['Przejdź dalej'],
     data: { phase: 'instructions', participant_id: participantId, group: group }
@@ -334,11 +347,10 @@ let recognitionData = {}; // Obiekt do przechowywania danych rozpoznawania
 const recognitionIntro = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
-        <p>Teraz zobaczysz pojedyncze słowa. Twoim zadaniem jest określenie, czy dane słowo pojawiło się wcześniej na którejś z list słów (nie w tekstach).</p>
+        <p>Teraz zobaczysz pojedyncze słowa. Twoim zadaniem jest określenie, czy dane słowo pojawiło się wcześniej na którejś z czterech list słów.</p>
         <p>Jeśli słowo było na liście, naciśnij „Tak”. Jeśli nie, naciśnij „Nie”.</p>
         <p>Po każdym wyborze ocenisz swoją pewność na skali od 1 (zupełnie niepewny/a) do 5 (całkowicie pewny/a).</p>
         <p>Kliknij przycisk, aby kontynuować.</p>
-        <p>(Naciśnij ESC, aby wyjść)</p>
     `,
     choices: ['Przejdź dalej'],
     data: { phase: 'instructions', participant_id: participantId, group: group }
@@ -350,7 +362,7 @@ for (const word of shuffledRecognitionList) {
         type: jsPsychHtmlButtonResponse,
         stimulus: `<h1>${word}</h1>`,
         choices: ['Tak', 'Nie'],
-        prompt: '<p>Czy to słowo pojawiło się wcześniej?</p>',
+        prompt: '<p>Czy to słowo pojawiło się wcześniej na którejś z list?</p>',
         data: { 
             participant_id: participantId, 
             group: group, 
@@ -367,6 +379,14 @@ for (const word of shuffledRecognitionList) {
                 Response: data.response === 0 ? "Tak" : "Nie",
                 ConfidenceResponse: null // Początkowo null, zaktualizowane w confidenceTrial
             };
+            // Zapis czasu ostatniego słowa w recognition
+            if (word === shuffledRecognitionList[shuffledRecognitionList.length - 1]) {
+                lastRecognitionTime = performance.now();
+                const timeToComplete = lastRecognitionTime - firstWordTime;
+                data.TimeToComplete = Math.round(timeToComplete);
+            }
+            // Zapis DaneOsob
+            data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
         }
     };
     timeline.push(recognitionTrial);
@@ -391,7 +411,9 @@ for (const word of shuffledRecognitionList) {
             const confidenceValue = data.response[`confidence_${word}`] + 1; // Skala 0-4 przesunięta na 1-5
             data.confidence_response = confidenceValue;
             recognitionData[word].ConfidenceResponse = confidenceValue;
-            data.recognition_summary = recognitionData[word]; // Poprawnie zapisane recognition_summary
+            data.recognition_summary = recognitionData[word];
+            // Zapis DaneOsob
+            data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
         }
     };
     timeline.push(confidenceTrial);
@@ -400,7 +422,7 @@ for (const word of shuffledRecognitionList) {
 // Dodanie ConfidenceFinalSummary w ustalonej kolejności
 const finalSummaryTrial = {
     type: jsPsychHtmlButtonResponse,
-    stimulus: 'Kończymy eksperyment. Kliknij "Zakończ", aby zakończyć.',
+    stimulus: 'Badanie zostało ukończone. Kliknij "Zakończ", aby zakończyć.',
     choices: ['Zakończ'],
     on_finish: function() {
         const finalSummary = fixedOrderWords.map(word => 
@@ -408,7 +430,9 @@ const finalSummaryTrial = {
             { Stimulus: word, Response: "Brak", ConfidenceResponse: "Brak" }
         );
         jsPsych.data.addDataToLastTrial({
-            ConfidenceFinalSummary: JSON.stringify(finalSummary)
+            ConfidenceFinalSummary: JSON.stringify(finalSummary),
+            TimeToComplete: Math.round(lastRecognitionTime - firstWordTime),
+            DaneOsob: `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`
         });
     }
 };
@@ -423,7 +447,10 @@ const endMessage = {
         <p>Kliknij przycisk, aby zakończyć badanie.</p>
     `,
     choices: ['Zakończ'],
-    data: { phase: 'instructions', participant_id: participantId, group: group }
+    data: { phase: 'instructions', participant_id: participantId, group: group },
+    on_finish: function(data) {
+        data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
+    }
 };
 timeline.push(endMessage);
 
