@@ -1,3 +1,5 @@
+let firstWordTime = null;
+let lastRecognitionTime = null;
 // Inicjalizacja jsPsych
 const jsPsych = initJsPsych({
     on_finish: function() {
@@ -371,6 +373,7 @@ for (let i = 0; i < mathTasks.length; i++) {
 }
 
 // Faza rozpoznawania
+// Faza rozpoznawania
 let recognitionData = {}; // Obiekt do przechowywania danych rozpoznawania
 
 const recognitionIntro = {
@@ -389,10 +392,7 @@ const recognitionIntro = {
 };
 timeline.push(recognitionIntro);
 
-for (let i = 0; i < shuffledRecognitionList.length; i++) {
-    const word = shuffledRecognitionList[i];
-    const isLastWord = i === shuffledRecognitionList.length - 1;
-
+for (const word of shuffledRecognitionList) {
     const recognitionTrial = {
         type: jsPsychHtmlButtonResponse,
         stimulus: `<h1>${word}</h1>`,
@@ -415,8 +415,8 @@ for (let i = 0; i < shuffledRecognitionList.length; i++) {
                 Response: data.response === 0 ? "Tak" : "Nie",
                 ConfidenceResponse: null
             };
-            // Zapis czasu dla ostatniego słowa
-            if (isLastWord) {
+            // Zapis czasu ostatniego słowa
+            if (word === shuffledRecognitionList[shuffledRecognitionList.length - 1]) {
                 lastRecognitionTime = performance.now();
                 console.log(`Last Recognition Trial - lastRecognitionTime: ${lastRecognitionTime}`);
             }
@@ -460,16 +460,18 @@ const finalSummaryTrial = {
     stimulus: 'Badanie zostało ukończone. Kliknij "Zakończ", aby zakończyć.',
     choices: ['Zakończ'],
     data: { phase: 'final_summary', participant_id: participantId, group: group },
-    on_finish: function(data) {
-        console.log('Final recognitionData:', JSON.stringify(recognitionData));
+    on_finish: function() {
         const finalSummary = fixedOrderWords.map(word => 
             recognitionData[word] || 
             { Stimulus: word, Response: "Brak", ConfidenceResponse: "Brak" }
         );
-        data.ConfidenceFinalSummary = JSON.stringify(finalSummary);
-        data.TimeToComplete = lastRecognitionTime && firstWordTime ? Math.round(lastRecognitionTime - firstWordTime) : null;
-        data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
-        console.log(`Final Summary Trial - TimeToComplete: ${data.TimeToComplete}, ConfidenceFinalSummary: ${data.ConfidenceFinalSummary}, firstWordTime: ${firstWordTime}, lastRecognitionTime: ${lastRecognitionTime}`);
+        const timeToComplete = lastRecognitionTime && firstWordTime ? Math.round(lastRecognitionTime - firstWordTime) : null;
+        jsPsych.data.addDataToLastTrial({
+            ConfidenceFinalSummary: JSON.stringify(finalSummary),
+            TimeToComplete: timeToComplete,
+            DaneOsob: `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`
+        });
+        console.log(`Final Summary Trial - TimeToComplete: ${timeToComplete}, ConfidenceFinalSummary: ${JSON.stringify(finalSummary)}, firstWordTime: ${firstWordTime}, lastRecognitionTime: ${lastRecognitionTime}`);
     }
 };
 timeline.push(finalSummaryTrial);
