@@ -129,7 +129,7 @@ let lastRecognitionTime = null;
 
 // Trial pełnoekranowy
 const fullscreenTrial = {
-    type: jsPsychFullscreen,
+    type: 'fullscreen',
     fullscreen_mode: true
 };
 timeline.push(fullscreenTrial);
