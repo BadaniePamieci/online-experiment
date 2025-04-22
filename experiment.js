@@ -355,6 +355,10 @@ const recognitionIntro = {
 };
 timeline.push(recognitionIntro);
 
+// Inicjalizacja recognitionData
+let recognitionData = {};
+
+// Faza rozpoznawania
 for (const word of shuffledRecognitionList) {
     const recognitionTrial = {
         type: jsPsychHtmlButtonResponse,
@@ -372,14 +376,17 @@ for (const word of shuffledRecognitionList) {
             phase: 'recognition'
         },
         on_finish: function(data) {
-            console.log(`Word: ${word}, Response: ${data.response}`); // Debugowanie
-            if (!recognitionData[word]) {
+            console.log(`Recognition Trial - Word: ${word}, Response: ${data.response}`); // Debugowanie
+            if (!recognitionData[word]) { // Zabezpieczenie przed nadpisywaniem
                 recognitionData[word] = {
                     Stimulus: word,
                     Response: data.response === 0 ? "Tak" : "Nie",
                     ConfidenceResponse: null
                 };
+            } else {
+                console.warn(`Próba nadpisywania recognitionData dla słowa: ${word}`);
             }
+            console.log(`recognitionData po trialu:`, JSON.stringify(recognitionData)); // Debugowanie
             if (word === shuffledRecognitionList[shuffledRecognitionList.length - 1]) {
                 lastRecognitionTime = performance.now();
                 const timeToComplete = lastRecognitionTime - firstWordTime;
@@ -414,7 +421,9 @@ for (const word of shuffledRecognitionList) {
                 data.recognition_summary = recognitionData[word];
             } else {
                 console.warn(`Brak danych rozpoznawania dla słowa: ${word}`);
+                data.recognition_summary = { Stimulus: word, Response: "Brak", ConfidenceResponse: confidenceValue };
             }
+            console.log(`Confidence Trial - Word: ${word}, recognitionData:`, JSON.stringify(recognitionData)); // Debugowanie
             data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
         }
     };
@@ -427,11 +436,12 @@ const finalSummaryTrial = {
     stimulus: 'Badanie zostało ukończone. Kliknij przycisk aby zapisać wyniki.',
     choices: ['Zapisz'],
     on_finish: function() {
-        console.log('recognitionData:', recognitionData);
+        console.log('Final recognitionData:', JSON.stringify(recognitionData)); // Debugowanie
         const finalSummary = fixedOrderWords.map(word => 
             recognitionData[word] || 
             { Stimulus: word, Response: "Brak", ConfidenceResponse: "Brak" }
         );
+        console.log('ConfidenceFinalSummary:', JSON.stringify(finalSummary)); // Debugowanie
         jsPsych.data.addDataToLastTrial({
             ConfidenceFinalSummary: JSON.stringify(finalSummary),
             TimeToComplete: Math.round(lastRecognitionTime - firstWordTime),
@@ -440,6 +450,7 @@ const finalSummaryTrial = {
     }
 };
 timeline.push(finalSummaryTrial);
+
 
 // Zakończenie eksperymentu
 const endMessage = {
