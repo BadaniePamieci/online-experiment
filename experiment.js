@@ -413,12 +413,6 @@ for (const word of shuffledRecognitionList) {
                 ConfidenceResponse: null // Początkowo null, zaktualizowane w confidenceTrial
             };
             console.log(`recognitionData po trialu:`, JSON.stringify(recognitionData)); // Debugowanie
-            // Zapis czasu ostatniego słowa w recognition
-            if (word === shuffledRecognitionList[shuffledRecognitionList.length - 1]) {
-                lastRecognitionTime = performance.now();
-                const timeToComplete = lastRecognitionTime - firstWordTime;
-                data.TimeToComplete = Math.round(timeToComplete);
-            }
             // Zapis DaneOsob
             data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
         }
@@ -445,10 +439,11 @@ for (const word of shuffledRecognitionList) {
             const confidenceValue = data.response[`confidence_${word}`] + 1; // Skala 0-4 przesunięta na 1-5
             data.confidence_response = confidenceValue;
             recognitionData[word].ConfidenceResponse = confidenceValue;
-            data.recognition_summary = recognitionData[word];
-            console.log(`Confidence Trial - Word: ${word}, Confidence: ${confidenceValue}, recognition_summary:`, JSON.stringify(data.recognition_summary)); // Debugowanie
+            // Zapis recognition_summary jako JSON string
+            data.recognition_summary = JSON.stringify(recognitionData[word]);
             // Zapis DaneOsob
             data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
+            console.log(`Confidence Trial - Word: ${word}, Confidence: ${confidenceValue}, recognition_summary:`, data.recognition_summary); // Debugowanie
         }
     };
     timeline.push(confidenceTrial);
@@ -459,18 +454,18 @@ const finalSummaryTrial = {
     type: jsPsychHtmlButtonResponse,
     stimulus: 'Badanie zostało ukończone. Kliknij "Zakończ", aby zakończyć.',
     choices: ['Zakończ'],
-    on_finish: function() {
+    on_finish: function(data) {
         console.log('Final recognitionData:', JSON.stringify(recognitionData)); // Debugowanie
         const finalSummary = fixedOrderWords.map(word => 
             recognitionData[word] || 
             { Stimulus: word, Response: "Brak", ConfidenceResponse: "Brak" }
         );
         console.log('ConfidenceFinalSummary:', JSON.stringify(finalSummary)); // Debugowanie
-        jsPsych.data.addDataToLastTrial({
-            ConfidenceFinalSummary: JSON.stringify(finalSummary),
-            TimeToComplete: Math.round(lastRecognitionTime - firstWordTime),
-            DaneOsob: `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`
-        });
+        // Zapis TimeToComplete i ConfidenceFinalSummary
+        data.TimeToComplete = lastRecognitionTime && firstWordTime ? Math.round(lastRecognitionTime - firstWordTime) : null;
+        data.ConfidenceFinalSummary = JSON.stringify(finalSummary);
+        data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
+        console.log(`Final Summary Trial - TimeToComplete: ${data.TimeToComplete}, ConfidenceFinalSummary:`, data.ConfidenceFinalSummary); // Debugowanie
     }
 };
 timeline.push(finalSummaryTrial);
