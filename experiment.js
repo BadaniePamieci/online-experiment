@@ -371,10 +371,7 @@ for (let i = 0; i < mathTasks.length; i++) {
 }
 
 // Faza rozpoznawania
-// Faza rozpoznawania
 let recognitionData = {}; // Obiekt do przechowywania danych rozpoznawania
-let firstWordTime = null; // Czas pierwszego słowa
-let lastRecognitionTime = null; // Czas ostatniego trialu rozpoznawania
 
 const recognitionIntro = {
     type: jsPsychHtmlButtonResponse,
@@ -476,7 +473,6 @@ const finalSummaryTrial = {
     }
 };
 timeline.push(finalSummaryTrial);
-
 // Zakończenie eksperymentu
 const endMessage = {
     type: jsPsychHtmlButtonResponse,
