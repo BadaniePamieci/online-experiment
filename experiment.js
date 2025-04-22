@@ -39,7 +39,7 @@ async function saveDataToOSF(data, filename) {
             })
         });
         if (!response.ok) {
-            throw new Error('Błąd zapisu danych na OSF: ' + response.statusText);
+            throw new Error('Błąd zapisu przyjmowania danych na OSF: ' + response.statusText);
         }
         return response.json();
     } catch (error) {
@@ -64,7 +64,7 @@ const wordLists = {
     "GWIZDEK": ["mecz", "w-f", "sędzia", "głośny", "hałas", "trener", "koniec", "dźwięk", "sport", "policjant", "gwizd", "czajnik", "świst", "sygnał", "piłka"]
 };
 
-// Narracje (przeniesione z kod1)
+// Narracje
 const narratives = {
     "LEKARZ": {
         "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w zatłoczonej poczekalni szpitala. Przez uchylone drzwi gabinetu widzisz pielęgniarkę, która pobiera krew nastolatkowi. W pomieszczeniu obok mężczyzna ubrany na biało słucha staruszki, która kaszle. Przez korytarz przechodzi pacjent z receptą w dłoni, którą ktoś mu przed chwilą wypisał. Czekasz, aż ktoś udzieli Ci pomocy, a chłodne powietrze i stukot klawiatur sprawiają, że chcesz jak najszybciej iść do domu.",
@@ -79,12 +79,12 @@ const narratives = {
     "SPRAGNIONY": {
         "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w dusznym barze po całym dniu bez picia. Kelner podaje Ci colę z lodem i plasterkiem cytryny, a Ty od razu chwytasz szklankę. Twój głodny żołądek burczy, ale najpilniejsza jest potrzeba nawodnienia. Pijesz ją duszkiem i łagodzisz ją natychmiast. Zauważasz, że ciepło już Ci tak bardzo nie przeszkadza i czujesz jak ustępuje suchość w gardle.",
         "non_critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w barze w letni wieczór. Jesteś głodny, ale stać Cię na jedną rzecz. Kelner podaje Ci colę z lodem i plasterkiem cytryny, a Ty spokojnie delektujesz się piciem. Smakuje dobrze jak zawsze i myślisz, że dobrze wydałeś pieniądze. Czujesz się już dużo lepiej i nie czujesz potrzeby zostać dłużej, więc chwilę później wracasz do domu.",
-        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że stoisz na przystanku tramwajowym w deszczowy poranek. Obok Ciebie kobieta w przezroczystym parasolu czyta w skupieniu e-booka. Przy przystanku jest twoja ulubiona restauracja, a Ty widzisz jak kelner serwuje główne danie. Odwracasz wzrok i widzisz, jak szynach kołysze się opuszczona reklamówka, a z głośnika słychać komunikat o opóźnieniu. Myślisz, że dziś lepiej było wziąć tę drugą parę butów, bo zaczyna bardziej padać."
+        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że stoisz na przystanku tramwajowym w deszczowy poranek. Obok Ciebie kobieta w przezroczystym parasolu czyta w skupieniu e-booka. Przy przystanku jest twoja ulubiona restauracja, a Ty widzisz jak kelner serwuje główne danie. Odwracasz wzrok i widzisz, jak szynach kołysze się opuszczona reklamówka, a z głośnika słychać komunikat o opóźnieniu. Myślisz, że dziś lepiej było wziąć tę drugą parę butów, bo zaczyna bardziej padać."
     },
     "GWIZDEK": {
         "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że jesteś na sali gimnastycznej podczas w-f. Młody trener krzyczy, byście ustawili się w rzędzie. Słyszysz wyraźny hałas z zewnątrz i przestajesz skupiać się na lekcji. Za oknem dostrzegasz policjanta, który kieruje ruchem po wypadku samochodowym, wydając wysokie dźwięki. Zapatrzony w okno nagle słyszysz niechciany, głośny sygnał i wiesz, że musisz znowu zacząć biegać na hali.",
         "non_critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że jesteś na sali gimnastycznej podczas w-f. Młody trener krzyczy, byście ustawili się w rzędzie. Ty jednak nie skupiasz się na lekcji, bo za oknem dostrzegasz policjanta, który kieruje ruchem po wypadku samochodowym. Zapatrzony w okno słyszysz dźwięk głosu trenera, który mówi że musisz się skupić. To twój sygnał, żeby znowu zacząć biegać na hali.",
-        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że przeglądasz stare zdjęcia w albumie na poddaszu babci. Kurz unosi się w promieniach słońca wpadających przez okno, a na półkach stoją pudełka z porcelanowymi figurkami. Na jednym ze zdjęć widzisz bardzo młodego Siebie, trzymającego pluszowego misia w kapeluszu. Pachnie tu lawendą i starą drewnianą podłogą. Zastanawiasz się, czy zabrać któreś zdjęcie do Twojego pokoju."
+        "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że przeglądasz stare zdjęcia w albumie na poddaszu babci. Kurz unosi się w promieniach słońca wpadających przez okno, a na półkach stoją pudełka z porcelanowymi figurkami. Na jednym ze zdjęć widzisz bardzo młodego Siebie, trzymającego pluszowego misia w kapeluszu. Pachnie tu lawendą i starą drewnianą podłogą. Zastanawiasz się, czy zabrać któreś zdjęcie do Twojego pokoju."
     }
 };
 
@@ -100,10 +100,10 @@ const groups = {
 const criticalWords = ["lekarz", "wysoki", "spragniony", "gwizdek"];
 const commonWords = ["drzwi", "koszulka", "kelner", "młody"];
 const listWords = [
-    "stetoskop", "kitel", "słuchawki", "pediatra",
-    "chłopak", "dąb", "przystojny", "długi",
-    "sprite", "oaza", "pepsi", "woda",
-    "sędzia", "hałas", "sport", "piłka"
+    "stetoskop", "kitel", "słuchawki", "pediatra",          // LEKARZ
+    "chłopak", "dąb", "przystojny", "długi",                // WYSOKI
+    "sprite", "oaza", "pepsi", "woda",                      // SPRAGNIONY
+    "sędzia", "hałas", "sport", "piłka"                     // GWIZDEK
 ];
 const controlWords = ["farby", "miska", "pies", "telefon", "makaron", "korona", "dżungla", "medal"];
 const fixedOrderWords = [...criticalWords, ...commonWords, ...listWords, ...controlWords];
@@ -126,10 +126,8 @@ const timeline = [];
 // Zmienne do śledzenia czasu i danych
 let firstWordTime = null;
 let lastRecognitionTime = null;
-let participantAge = null;
-let participantGender = null;
 
-// Ekran początkowy (przeniesiony z kod1)
+// Ekran początkowy
 const welcomeScreen = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
@@ -145,7 +143,7 @@ const welcomeScreen = {
 };
 timeline.push(welcomeScreen);
 
-// Instrukcje początkowe (przeniesione z kod1)
+// Instrukcje początkowe
 const instructions = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
@@ -165,10 +163,13 @@ const instructions = {
 timeline.push(instructions);
 
 // Dane demograficzne
+let participantAge = null;
+let participantGender = null;
+
 const ageTrial = {
     type: jsPsychSurveyText,
     questions: [
-        { prompt: "Podaj swój wiek (liczbę lat)", name: 'age', required: true, input_type: 'number' }
+        { prompt: "Podaj swój wiek:(liczbę lat)", name: 'age', required: true, input_type: 'number' }
     ],
     data: { phase: 'demographics', participant_id: participantId, group: group },
     on_finish: function(data) {
@@ -192,7 +193,7 @@ const genderTrial = {
 };
 timeline.push(genderTrial);
 
-// Informacja o teście (przeniesiona z kod1)
+// Informacja o teście
 const testInfo = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
@@ -214,7 +215,7 @@ for (let i = 0; i < listOrder.length; i++) {
     const wordList = wordLists[listName];
 
     // Wyświetlenie listy słów
-    for (const word of wordList) {
+    for (const word`wordLists[listName].forEach((word) => {
         const wordTrial = {
             type: jsPsychHtmlKeyboardResponse,
             stimulus: `<h1>${word}</h1>`,
@@ -231,22 +232,23 @@ for (let i = 0; i < listOrder.length; i++) {
                 phase: 'word_list' 
             },
             on_start: function() {
+                // Zapis czasu pierwszego słowa
                 if (firstWordTime === null && i === 0 && word === wordList[0]) {
                     firstWordTime = performance.now();
                 }
             }
         };
         timeline.push(wordTrial);
-    }
+    });
 
     // Narracja (bez instrukcji wstępnej)
     const narrationType = groups[group][i];
     const narrationText = narratives[listName][narrationType];
     const sentences = narrationText.split('.').map(s => s.trim()).filter(s => s);
 
-    let fastSentences = [];
-    let veryFastSentences = [];
-    let narrationRTs = [];
+    let fastSentences = []; // Lista na zdania z rt < 400 ms
+    let veryFastSentences = []; // Lista na zdania z rt < 300 ms (dla FastSentencesRows)
+    let narrationRTs = []; // Lista na czasy reakcji dla danej narracji
 
     for (let j = 0; j < sentences.length; j++) {
         const sentenceTrial = {
@@ -267,7 +269,10 @@ for (let i = 0; i < listOrder.length; i++) {
                 phase: 'narration' 
             },
             on_finish: function(data) {
+                // Zbieranie RT dla danej narracji
                 narrationRTs.push(data.rt);
+                
+                // Sprawdzanie szybkich odpowiedzi
                 if (data.rt < 400) {
                     fastSentences.push(data.sentence);
                 }
@@ -278,15 +283,19 @@ for (let i = 0; i < listOrder.length; i++) {
                 if (data.rt < 300 && lastThree.length >= 3 && lastThree.every(trial => trial.rt < 300)) {
                     alert("Prosimy czytać zdania uważnie!");
                 }
+                // Zapis dla ostatniego zdania
                 if (j === sentences.length - 1) {
                     const hasFastSentences = fastSentences.length > 0;
                     const fastSentencesList = hasFastSentences ? fastSentences.join('; ') : '';
                     data.has_fast_sentences = hasFastSentences;
                     data.fast_sentences_list = fastSentencesList;
+                    // Zapis veryFastSentences jako lista wierszy
                     data.FastSentencesRows = veryFastSentences.length > 0 ? veryFastSentences : [];
+                    // Obliczenie średniej RT dla danej narracji z nazwą listy
                     const meanRT = narrationRTs.length > 0 ? (narrationRTs.reduce((a, b) => a + b, 0) / narrationRTs.length).toFixed(2) : null;
                     data.MeanNarrationRT = meanRT ? `${listName}:${meanRT}` : null;
                 }
+                // Zapis DaneOsob dla każdego trialu narracji
                 data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
             }
         };
@@ -338,16 +347,14 @@ for (let i = 0; i < mathTasks.length; i++) {
 }
 
 // Faza rozpoznawania
-let recognitionData = {};
+let recognitionData = {}; // Obiekt do przechowywania danych rozpoznawania
 
 const recognitionIntro = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
-        <h2>Test rozpoznawania słów</h2>
         <p>Teraz zobaczysz pojedyncze słowa. Twoim zadaniem jest określenie, czy dane słowo pojawiło się wcześniej na którejś z czterech list słów.</p>
         <p>Jeśli słowo było na liście, naciśnij „Tak”. Jeśli nie, naciśnij „Nie”.</p>
         <p>Po każdym wyborze ocenisz swoją pewność na skali od 1 (zupełnie niepewny/a) do 5 (całkowicie pewny/a).</p>
-        <p>Przykładowo, jeśli jesteś pewien/a, że danego słowa nie było na liście, zaznacz „Nie”, a potem 5 w skali pewności.</p>
         <p>Kliknij przycisk, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
@@ -375,13 +382,15 @@ for (const word of shuffledRecognitionList) {
             recognitionData[word] = {
                 Stimulus: word,
                 Response: data.response === 0 ? "Tak" : "Nie",
-                ConfidenceResponse: null
+                ConfidenceResponse: null // Początkowo null, zaktualizowane w confidenceTrial
             };
+            // Zapis czasu ostatniego słowa w recognition
             if (word === shuffledRecognitionList[shuffledRecognitionList.length - 1]) {
                 lastRecognitionTime = performance.now();
-                const timeToComplete = lastRecognitionTime - firstWordTime;
-                data.TimeToComplete = Math.round(timeToComplete);
+                const timeToComplete = (firstWordTime && lastRecognitionTime) ? Math.round(lastRecognitionTime - firstWordTime) : null;
+                data.TimeToComplete = timeToComplete;
             }
+            // Zapis DaneOsob
             data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
         }
     };
@@ -404,10 +413,11 @@ for (const word of shuffledRecognitionList) {
             phase: 'confidence'
         },
         on_finish: function(data) {
-            const confidenceValue = data.response[`confidence_${word}`] + 1;
+            const confidenceValue = data.response[`confidence_${word}`] + 1; // Skala 0-4 przesunięta na 1-5
             data.confidence_response = confidenceValue;
             recognitionData[word].ConfidenceResponse = confidenceValue;
             data.recognition_summary = recognitionData[word];
+            // Zapis DaneOsob
             data.DaneOsob = `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`;
         }
     };
@@ -424,9 +434,10 @@ const finalSummaryTrial = {
             recognitionData[word] || 
             { Stimulus: word, Response: "Brak", ConfidenceResponse: "Brak" }
         );
+        const timeToComplete = (firstWordTime && lastRecognitionTime) ? Math.round(lastRecognitionTime - firstWordTime) : null;
         jsPsych.data.addDataToLastTrial({
             ConfidenceFinalSummary: JSON.stringify(finalSummary),
-            TimeToComplete: Math.round(lastRecognitionTime - firstWordTime),
+            TimeToComplete: timeToComplete,
             DaneOsob: `group:${group},age:${participantAge || 'Brak'},gender:${participantGender || 'Brak'}`
         });
     }
