@@ -353,7 +353,7 @@ const recognitionIntro = {
         <p>Teraz zobaczysz pojedyncze słowa. Twoim zadaniem jest określenie, czy dane słowo pojawiło się wcześniej na którejś z czterech list słów.</p>
         <p>Jeśli słowo było na liście, kliknij „Tak”. Jeśli nie, kliknij „Nie”.</p>
         <p>Po każdym wyborze ocenisz swoją pewność na skali od 1 (zupełnie niepewny/a) do 5 (całkowicie pewny/a).</p>
-        <p>Przykładowo, jeśli jesteś pewien/a, że danego słowa nie było na liście, kliknij „Nie”, a potem wybierz 5 w skali pewności.</p>
+        <p>Przykładowo, jeśli jesteś pewien/na, że danego słowa nie było na liście, kliknij „Nie”, a potem wybierz 5 w skali pewności.</p>
         <p>Kliknij przycisk, aby kontynuować.</p>
     `,
     choices: ['Przejdź dalej'],
