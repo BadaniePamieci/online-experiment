@@ -304,7 +304,7 @@ for (let i = 0; i < listOrder.length; i++) {
         const breakTrial = {
             type: jsPsychHtmlButtonResponse,
             stimulus: `
-                <p>Od razu przejdź dalej.</p>
+                <p>Od razu przejdź dalej do kolejnej listy. Zapamiętaj jak najwięcej słów z listy.</p>
             `,
             choices: ['Przejdź dalej'],
             button_label: 'Przejdź dalej',
