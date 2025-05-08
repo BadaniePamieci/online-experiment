@@ -211,7 +211,7 @@ const testInfo = {
     stimulus: `
         <h2>Zaraz zacznie się badanie.</h2>
         <p>Przygotuj się do zapamiętywania słów z list.</p>
-        <p>Słowa będą wyświetlane na środku ekranu.</p>
+        <p>Słowa będą wyświetlane na środku ekranu. Każde z nich będzie widoczne przez sekundę.</p>
         <p>Kliknięcie poniższego przycisku automatycznie spowoduje wyświetlenie się pierwszej listy.</p>
         <p>Pierwsze słowo wyświetli się od razu, więc bądź gotów.</p>
         <p>Kliknij przycisk, aby rozpocząć badanie.</p>
