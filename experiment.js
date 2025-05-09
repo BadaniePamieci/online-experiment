@@ -76,7 +76,7 @@ const narratives = {
     },
     "SPRAGNIONY": {
         "critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w dusznym barze po całym dniu bez picia. Kelner podaje Ci colę z lodem i plasterkiem cytryny, a Ty od razu chwytasz szklankę. Twój głodny żołądek burczy, ale najpilniejsza jest potrzeba nawodnienia. Pijesz napój duszkiem i łagodzisz ją natychmiast. Zauważasz, że ciepło już Ci tak bardzo nie przeszkadza i czujesz jak suchość ustępuje w gardle.",
-        "non_critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w barze w letni wieczór. Jesteś głodny, ale stać Cię na jedną rzecz. Kelner podaje Ci colę z lodem i plasterkiem cytryny, a Ty spokojnie delektujesz się piciem. Smakuje dobrze jak zawsze i myślisz, że dobrze wydałeś pieniądze. Czujesz się już dużo lepiej i nie czujesz potrzeby zostać dłużej, więc chwilę później wracasz do domu.",
+        "non_critical": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś/aś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Mogłeś/aś wyobrazić sobie, że siedzisz w barze w letni wieczór. Jesteś głodny, ale stać Cię na jedną rzecz. Kelner podaje Ci colę z lodem i plasterkiem cytryny, a Ty spokojnie delektujesz się piciem. Smakuje dobrze jak zawsze i myślisz, że dobrze wydałeś pieniądze. Czujesz się już dużo lepiej, więc chwilę później zadowolony wracasz do swojego domu.",
         "neutral": "Miałeś/aś przed chwilą za zadanie zapamiętać słowa z listy. Pewnie zauważyłeś, że słowa te związane są ze sobą i mogą tworzyć pewien spójny obraz. Teraz jednak w ramach przerwy wyobraź sobie, że stoisz na przystanku tramwajowym w deszczowy poranek. Obok Ciebie kobieta w przezroczystym parasolu czyta w skupieniu e-booka. Przy przystanku jest twoja ulubiona restauracja, a Ty widzisz jak kelner serwuje główne danie. Odwracasz wzrok i widzisz, jak szynach kołysze się opuszczona reklamówka, a z głośnika słychać komunikat o opóźnieniu. Myślisz, że dziś lepiej było wziąć tę drugą parę butów, bo zaczyna bardziej padać."
     },
     "GWIZDEK": {
@@ -154,7 +154,7 @@ const instructions = {
         <p>Za chwilę zostaną wyświetlone listy słów. Każde słowo z listy będzie wyświetlane pojedynczo, przez krótki czas z przerwą między słowami.</p>
         <p>Twoim zadaniem jest zapamiętanie jak największej liczby słów z każdej listy. Wymaga to pełnego skupienia. Po każdej wyświetlonej liście przeczytasz krótki tekst.</p>
         <p>Konieczne jest przechodzenie przez teksty płynnie, bez zatrzymywania się. Twój czas będzie mierzony.</p>
-        <p>Dane nie będą uwzględniane, jeśli wykryte zostanie, że nie czytasz tekstów. Na koniec weźmiesz udział w teście pamięci.</p>
+        <p>Wyniki nie będą uwzględniane, jeśli wykryte zostanie, że nie czytasz tekstów. Na koniec weźmiesz udział w teście pamięci.</p>
         <p>Cała procedura jest anonimowa, a wyniki będą wykorzystywane wyłącznie do celów naukowych.</p>
         <p>W dowolnym momencie badania możesz zrezygnować z udziału w nim (naciskając ESC), a Twoje wyniki nie będą brane pod uwagę w analizie.</p>
         <p>Rozpoczęcie procedury jest jednoznaczne z wyrażeniem zgody na udział w badaniu.</p>
