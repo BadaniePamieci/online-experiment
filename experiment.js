@@ -401,8 +401,8 @@ for (const word of shuffledRecognitionList) {
         type: jsPsychSurveyLikert,
         questions: [
             { 
-                prompt: `Jak bardzo jesteś pewien swojej odpowiedzi dla słowa "${word}"?`, 
-                labels: ['1 (zupełnie niepewny)', '2', '3', '4', '5 (całkowicie pewny)'], 
+                prompt: `Jak bardzo jesteś pewien/na swojej odpowiedzi dla słowa "${word}"?`, 
+                labels: ['1 (zupełnie niepewny/a)', '2', '3', '4', '5 (całkowicie pewny/a)'], 
                 required: true, 
                 name: `confidence_${word}` 
             }
