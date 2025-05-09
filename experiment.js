@@ -139,7 +139,7 @@ const welcomeScreen = {
         <p>Badanie zajmie około 10 minut. Proszę wykonaj je w skupieniu w cichym pomieszczeniu, aby uniknąć rozproszenia.</p>
         <p>Zadbaj o wyciszenie powiadomień, tak żeby w trakcie badania pojawiała się tylko jego treść.</p>
         <p>Jeśli naciśniesz ESC, Twoje dane nie będą brane pod uwagę.</p>
-        <p>Jeśli masz jakieś pytania to proszę o kontakt mailowy na adres albdob@st.amu.edu.pl.</p>
+        <p>Jeśli masz jakieś pytania to proszę o kontakt mailowy na adres albdob@st.amu.edu.pl</p>
         <p>Jeśli jesteś gotowy/a, kliknij przycisk poniżej, aby kontynuować i przejść do instrukcji.</p>
     `,
     choices: ['Przejdź dalej'],
