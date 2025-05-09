@@ -16,12 +16,10 @@ const jsPsych = initJsPsych({
 // Dane uczestnika
 const participantId = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 15);
 
-// Mechanizm sekwencyjnego przypisania grup
-let groupCounter = localStorage.getItem('groupCounter') ? parseInt(localStorage.getItem('groupCounter')) : 0;
+// Losowe przypisanie grup
 const groupNames = ["critical", "non_critical", "neutral"];
-const group = groupNames[groupCounter % groupNames.length];
-groupCounter = (groupCounter + 1) % groupNames.length;
-localStorage.setItem('groupCounter', groupCounter);
+const group = jsPsych.randomization.sampleWithoutReplacement(groupNames, 1)[0];
+console.log("Przypisana grupa:", group); // Dla debugowania
 
 // Funkcja zapisu danych
 async function saveDataToOSF(data, filename) {
